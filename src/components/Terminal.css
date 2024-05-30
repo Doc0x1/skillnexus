@@ -1,0 +1,147 @@
+:root {
+    --terminal-width: 1250px;
+    --terminal-height: 400px;
+    --terminal-bradius: 6px 6px 0 0;
+    --prompt: #ff1919;
+    --top-bar: #D7D7D7;
+    --shell: rgba(15, 15, 15, 0.8);
+    --path: #5D8DBC;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    list-style-type: none;
+    display: inline;
+    margin-right: 8px;
+}
+
+#linux-terminal, #windows-cmd, #mac-terminal {
+    width: var(--terminal-width);
+    height: var(--terminal-height);
+    border-radius: var(--terminal-bradius);
+    box-shadow: 1px 1px 8px #4D4D50;
+    position: absolute; /* Make it absolutely positioned */
+}
+
+.terminal {
+    position: relative;
+    height: 500px;
+    display: grid;
+    grid-auto-rows: 0.1fr 0.2fr 1fr;
+    overflow-y: auto;
+    color: #c4c4c4;
+    font-size: 14px;
+    line-height: 1.42;
+    background-color: #1e1e1e; /* Background color of the terminal */
+    color: #ffffff; /* Text color */
+    font-family: "Monaco", "Courier New", monospace; /* Font used in terminal */
+    border-radius: 10px;
+    width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.terminal .top-bar {
+    font-family: cantarell, sans-serif;
+    text-align: left;
+    font-size: 15px;
+    background-color: var(--top-bar);
+    padding: 1px;
+    cursor: move; /* Indicate it's draggable */
+}
+
+.terminal .top-bar .title-bar {
+    overflow: hidden;
+    height: 32px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 0.5rem;
+    color: black;
+}
+
+.terminal .top-bar .menu-bar {
+    padding: 0 2px;
+    margin: 3px;
+    color: black;
+}
+
+.terminal .top-bar .title-bar .title {
+    text-align: center;
+    padding-left: 45px;
+    color: black;
+}
+
+.terminal .top-bar .title-bar .top-btn {
+    top: 0;
+}
+
+#input-area {
+    background: none;
+    border: none;
+    color: white;
+    width: calc(100% - 10px);
+    outline: none;
+    font-family: monospace, sans-serif;
+    font-size: 13px;
+}
+
+.terminal:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3c3c3c;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.terminal-line {
+    line-height: 2;
+    white-space: pre-wrap;
+}
+
+.terminal-prompt {
+    display: flex;
+    align-self: end;
+}
+
+.terminal-path, .terminal-prompt-symbol {
+    color: rgb(93, 141, 188)
+}
+
+.terminal-user-host-seperator {
+    color: rgb(93, 141, 188)
+}
+
+.terminal-prompt-label {
+    flex: 0 0 auto;
+    color: #f9ef00;
+}
+
+.terminal-prompt-input {
+    flex: 1;
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.terminal-prompt-input input {
+    flex: 1;
+    width: 100%;
+    background-color: transparent;
+    color: white;
+    border: 0;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.42;
+    font-family: "IBM Plex Mono", Consolas, Menlo, Monaco, "Courier New", Courier, monospace;
+}
