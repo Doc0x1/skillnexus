@@ -3,9 +3,9 @@
     --terminal-height: 400px;
     --terminal-bradius: 6px 6px 0 0;
     --prompt: #ff1919;
-    --top-bar: #D7D7D7;
+    --top-bar: #d7d7d7;
     --shell: rgba(15, 15, 15, 0.8);
-    --path: #5D8DBC;
+    --path: #5d8dbc;
 }
 
 ul {
@@ -19,11 +19,13 @@ ul li {
     margin-right: 8px;
 }
 
-#linux-terminal, #windows-cmd, #mac-terminal {
+#linux-terminal,
+#windows-cmd,
+#mac-terminal {
     width: var(--terminal-width);
     height: var(--terminal-height);
     border-radius: var(--terminal-bradius);
-    box-shadow: 1px 1px 8px #4D4D50;
+    box-shadow: 1px 1px 8px #4d4d50;
     position: absolute; /* Make it absolutely positioned */
 }
 
@@ -38,7 +40,7 @@ ul li {
     line-height: 1.42;
     background-color: #1e1e1e; /* Background color of the terminal */
     color: #ffffff; /* Text color */
-    font-family: "Monaco", "Courier New", monospace; /* Font used in terminal */
+    font-family: 'Monaco', 'Courier New', monospace; /* Font used in terminal */
     border-radius: 10px;
     width: 600px;
     margin: 0 auto;
@@ -83,16 +85,13 @@ ul li {
 
 #input-area {
     background: none;
-    border: none;
     color: white;
     width: calc(100% - 10px);
-    outline: none;
-    font-family: monospace, sans-serif;
-    font-size: 13px;
+    height: 14px;
 }
 
 .terminal:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -113,12 +112,13 @@ ul li {
     align-self: end;
 }
 
-.terminal-path, .terminal-prompt-symbol {
-    color: rgb(93, 141, 188)
+.terminal-path,
+.terminal-prompt-symbol {
+    color: rgb(93, 141, 188);
 }
 
 .terminal-user-host-seperator {
-    color: rgb(93, 141, 188)
+    color: rgb(93, 141, 188);
 }
 
 .terminal-prompt-label {
@@ -128,10 +128,12 @@ ul li {
 
 .terminal-prompt-input {
     flex: 1;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
     display: flex;
     align-items: center;
     color: white;
+    font-size: 14px;
+    line-height: 1.42;
 }
 
 .terminal-prompt-input input {
@@ -141,7 +143,6 @@ ul li {
     color: white;
     border: 0;
     outline: none;
-    font-size: 14px;
-    line-height: 1.42;
-    font-family: "IBM Plex Mono", Consolas, Menlo, Monaco, "Courier New", Courier, monospace;
+
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
 }

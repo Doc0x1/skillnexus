@@ -1,60 +1,96 @@
-import React, { useState, useRef, useEffect } from 'react';
-import './Terminal.css';
-import commandsJson from '../commands.json'
-import { faCircleChevronUp, faMinusCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState, useRef, useEffect } from 'react'
+import './Terminal.css'
+import { faCircleChevronUp, faMinusCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import TerminalCursor from './terminalCursor/TerminalCursor'
+import { CommandSet } from '../types/commandSet'
 
-export default function Terminal() {
-    const [input, setInput] = useState<string>('');
-    const [history, setHistory] = useState<string[]>([]);
+interface TerminalProps {
+    selectedCommandSet: CommandSet
+}
 
-    const [commands, setCommands] = useState<any[]>([]);
-    const [selectedCommandSet, setSelectedCommandSet] = useState<string>('');
-    const [prompt, setPrompt] = useState<string>('');
+export default function Terminal({ selectedCommandSet }: TerminalProps) {
+    const [input, setInput] = useState<string>('')
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
+    const [currentCommand, setCurrentCommand] = useState<string>('')
+    const [currentDescription, setCurrentDescription] = useState<string>('')
 
-    const terminalRef = useRef<HTMLDivElement>(null);
+    const terminalRef = useRef<HTMLDivElement>(null)
 
-    const [isDragging, setIsDragging] = useState(false);
-    const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
-    const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false)
+    const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 })
+    const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 })
+    const [offset, setOffset] = useState({ x: 0, y: 0 })
 
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            const command = input.trim();
-            if (command) {
-                setHistory([...history, `root@kali:~# ${command}`, executeCommand(command)]);
-                setInput('');
+    const checkCommandInput = (updatedInput: string) => {
+        const commands = selectedCommandSet?.commands || []
+        if (currentCommandIndex < commands.length) {
+            const expectedCommand = commands[currentCommandIndex].command
+            if (updatedInput === expectedCommand) {
+                setCurrentCommandIndex(prev => prev + 1)
+                if (currentCommandIndex + 1 < commands.length) {
+                    setCurrentCommand(commands[currentCommandIndex + 1].command)
+                    setCurrentDescription(commands[currentCommandIndex + 1].description)
+                } else {
+                    setCurrentCommand('')
+                    setCurrentDescription('Select a Test to begin.')
+                }
+                setInput('')
+            } else {
+                setCurrentCommand(expectedCommand)
+                setCurrentDescription(commands[currentCommandIndex].description)
             }
         }
-    };
+    }
+
     const executeCommand = (command: string): string => {
-        // Here, you can implement the logic to execute different commands
-        // For example, you can have a switch statement to handle different commands
-        // or use a library like xterm.js to create a fully-functional terminal
+        return `$ ${command}`
+    }
 
-        // For simplicity, let's just echo the command
-        return `$ ${command}`;
-    };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const { key } = e
 
-    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCommandSet(e.target.value);
-    };
+        // Check the length of e.key, if it's larger than 1, it's a control key
+        if (key.length > 1) {
+            switch (key) {
+                case 'Backspace':
+                    e.preventDefault()
+                    setInput(prev => prev.slice(0, -1))
+                    break
+                case 'Enter':
+                    const command = input.trim()
+                    if (command) {
+                        executeCommand(command)
+                        setInput('')
+                        e.preventDefault()
+                    }
+                    break
+                default:
+                    e.preventDefault()
+                    break
+            }
+        } else {
+            const updatedInput = input + key
+            setInput(updatedInput)
+            checkCommandInput(updatedInput)
+        }
+    }
+
+    const handleMouseUp = () => {
+        setIsDragging(false)
+    }
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        setIsDragging(true);
-        setInitialPosition({ x: e.clientX, y: e.clientY });
-        setOffset({ x: currentPosition.x - e.clientX, y: currentPosition.y - e.clientY });
-    };
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
+        setIsDragging(true)
+        if (!initialPosition) setInitialPosition({ x: e.clientX, y: e.clientY })
+        setOffset({ x: currentPosition.x - e.clientX, y: currentPosition.y - e.clientY })
+    }
 
-    function startTest() {
-        const selectedTestElement = document.getElementById('test-select') as HTMLElement;
-        const selectedTest = selectedTestElement
-        console.log(selectedTest)
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (inputRef.current) {
+            inputRef.current.focus()
+        }
     }
 
     useEffect(() => {
@@ -62,39 +98,50 @@ export default function Terminal() {
             if (isDragging) {
                 setCurrentPosition({
                     x: e.clientX + offset.x,
-                    y: e.clientY + offset.y,
-                });
+                    y: e.clientY + offset.y
+                })
             }
-        };
+        }
 
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+        if (inputRef.current) {
+            inputRef.current.focus()
+        }
+
+        document.addEventListener('mousemove', handleMouseMove)
+        document.addEventListener('mouseup', handleMouseUp)
 
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [currentPosition, initialPosition, isDragging, offset]);
+            document.removeEventListener('mousemove', handleMouseMove)
+            document.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [isDragging, offset.x, offset.y])
+
+    useEffect(() => {
+        setCurrentCommandIndex(0)
+
+        if (selectedCommandSet?.commands?.length > 0) {
+            setCurrentCommand(selectedCommandSet.commands[0].command)
+            setCurrentDescription(selectedCommandSet.commands[0].description)
+        } else {
+            setCurrentCommand('')
+            setCurrentDescription('')
+        }
+        setInput('')
+    }, [selectedCommandSet])
 
     return (
         <>
-            <div>
-                <select id="test-select" value={selectedCommandSet} onChange={handleSelectChange}>
-                    <option value="">Select a Test to start</option>
-                    {Object.entries(commandsJson).map(([commands, { value }]) => (
-                        <option key={value} value={value}>
-                            {commands}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={startTest}>Start Test</button>
-            </div>
-            <div className='terminal' style={{
-                position: 'absolute',
-                left: currentPosition.x,
-                top: currentPosition.y,
-            }} id={selectedCommandSet} ref={terminalRef} onMouseDown={handleMouseDown}>
-                <div className="top-bar" id="drag-handle">
+            <div
+                className="terminal"
+                style={{
+                    position: 'absolute',
+                    left: currentPosition.x,
+                    top: currentPosition.y
+                }}
+                ref={terminalRef}
+                onClick={handleClick}
+            >
+                <div className="top-bar" id="drag-handle" onMouseDown={handleMouseDown}>
                     <div className="title-bar">
                         <p className="title">root@linux:~</p>
                         <ul className="top-btn">
@@ -112,16 +159,37 @@ export default function Terminal() {
                         <li>Help</li>
                     </ul>
                 </div>
-                <div className="terminal-line">Test Line</div>
-                <div className="terminal-prompt text-left items-baseline">
-                    <span className="terminal-user text-red-500">root</span>
-                    <span className='terminal-user-host-seperator'>@</span>
-                    <span className="terminal-host text-red-500">kali</span>
-                    <span className='text-white'>:</span>
-                    <span className="terminal-path">~</span>
-                    <span className="terminal-prompt-symbol">$</span>{' '}
-                    <div className="terminal-prompt-input terminal-prompt-line-two">
-                        <input id='input-area' type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} autoFocus />
+                <div className="terminal-line">
+                    {currentDescription !== '' ? currentDescription : 'Select a Test to begin'}
+                </div>
+                <div className="items-baseline self-end text-left">
+                    <div className="">
+                        {currentCommand && (
+                            <div className="command-info">
+                                <p className="command">{currentCommand}</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="terminal-prompt items-baseline text-left">
+                        <span className="terminal-user text-red-500">root@linux</span>
+                        <span className="text-white">:</span>
+                        <span className="terminal-path">~</span>
+                        <span className="text-white">$</span>{' '}
+                        <div className="terminal-prompt-input relative">
+                            {input}
+                            <TerminalCursor />
+                            <input
+                                id="input-area"
+                                style={{
+                                    caretColor: 'transparent'
+                                }}
+                                ref={inputRef}
+                                type="text"
+                                className="absolute left-0 top-0 h-full w-full border-none opacity-0 outline-none"
+                                onKeyDown={handleKeyDown}
+                                autoFocus
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

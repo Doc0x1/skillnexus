@@ -1,0 +1,12 @@
+.cursor {
+  display: inline-block;
+  width: 5px; /* Adjust the width as needed */
+}
+
+.cursor.hidden {
+  opacity: 0;
+}
+
+.cursor.visible {
+  opacity: 1;
+}
