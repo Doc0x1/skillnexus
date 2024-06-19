@@ -1,12 +1,16 @@
-.cursor {
-  display: inline-block;
-  width: 5px; /* Adjust the width as needed */
+.terminal-cursor {
+    display: inline-block;
+    width: 1ch;
+    animation: blink 1s infinite;
 }
 
-.cursor.hidden {
-  opacity: 0;
-}
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 0;
+    }
 
-.cursor.visible {
-  opacity: 1;
+    50% {
+        opacity: 1;
+    }
 }

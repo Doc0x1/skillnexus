@@ -1,7 +1,7 @@
 :root {
-    --terminal-width: 1250px;
-    --terminal-height: 400px;
-    --terminal-bradius: 6px 6px 0 0;
+    --terminal-width: 1200px; /* Updated width to match the width in .terminal */
+    --terminal-height: 600px; /* Updated height to match the height in .terminal */
+    --terminal-bradius: 5px;
     --prompt: #ff1919;
     --top-bar: #d7d7d7;
     --shell: rgba(15, 15, 15, 0.8);
@@ -14,41 +14,29 @@ ul {
 }
 
 ul li {
-    list-style-type: none;
     display: inline;
     margin-right: 8px;
 }
 
-#linux-terminal,
-#windows-cmd,
-#mac-terminal {
-    width: var(--terminal-width);
-    height: var(--terminal-height);
-    border-radius: var(--terminal-bradius);
-    box-shadow: 1px 1px 8px #4d4d50;
-    position: absolute; /* Make it absolutely positioned */
-}
-
 .terminal {
     position: relative;
-    height: 500px;
+    width: var(--terminal-width);
+    height: var(--terminal-height);
     display: grid;
-    grid-auto-rows: 0.1fr 0.2fr 1fr;
+    grid-auto-rows: 0.1fr 1fr;
     overflow-y: auto;
-    color: #c4c4c4;
-    font-size: 14px;
-    line-height: 1.42;
     background-color: #1e1e1e; /* Background color of the terminal */
     color: #ffffff; /* Text color */
-    font-family: 'Monaco', 'Courier New', monospace; /* Font used in terminal */
-    border-radius: 10px;
-    width: 600px;
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
+    font-size: 14px;
+    line-height: 1.42;
+    border-radius: var(--terminal-bradius);
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .terminal .top-bar {
-    font-family: cantarell, sans-serif;
+    font-family: Cantarell, sans-serif;
     text-align: left;
     font-size: 15px;
     background-color: var(--top-bar);
@@ -59,7 +47,6 @@ ul li {
 .terminal .top-bar .title-bar {
     overflow: hidden;
     height: 32px;
-    position: relative;
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
@@ -83,13 +70,6 @@ ul li {
     top: 0;
 }
 
-#input-area {
-    background: none;
-    color: white;
-    width: calc(100% - 10px);
-    height: 14px;
-}
-
 .terminal:after {
     content: '';
     position: absolute;
@@ -109,21 +89,12 @@ ul li {
 
 .terminal-prompt {
     display: flex;
-    align-self: end;
-}
-
-.terminal-path,
-.terminal-prompt-symbol {
-    color: rgb(93, 141, 188);
-}
-
-.terminal-user-host-seperator {
-    color: rgb(93, 141, 188);
-}
-
-.terminal-prompt-label {
-    flex: 0 0 auto;
-    color: #f9ef00;
+    align-items: center;
+    line-height: 1.42;
+    font-size: 12px;
+    flex: auto;
+    margin-left: 0.5rem;
+    padding-bottom: 0.25rem;
 }
 
 .terminal-prompt-input {
@@ -132,17 +103,39 @@ ul li {
     display: flex;
     align-items: center;
     color: white;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.42;
 }
 
-.terminal-prompt-input input {
+.terminal-prompt-input > input {
     flex: 1;
     width: 100%;
     background-color: transparent;
+    caret-shape: bar;
+    caret-color: white;
     color: white;
-    border: 0;
     outline: none;
+    line-height: 1.42;
+    font-size: 12px;
+    white-space: pre;
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
+}
 
-    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+.terminal-prompt-input span {
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
+    font-size: 12px;
+    white-space: pre;
+}
+
+.correct-char {
+    color: white;
+}
+
+.incorrect-char {
+    color: red;
+}
+
+.bg-char {
+    color: grey;
+    opacity: 0.5;
 }

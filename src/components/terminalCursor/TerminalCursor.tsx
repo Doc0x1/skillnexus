@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import './TerminalCursor.css'; // Create this CSS file for styling
+import React from 'react'
+import './TerminalCursor.css'
 
-const TerminalCursor: React.FC = () => {
-    const [visible, setVisible] = useState(true);
+interface TerminalCursorProps {
+    className?: string
+}
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setVisible((prev) => !prev);
-        }, 500); // Blinking interval in milliseconds
+const TerminalCursor: React.FC<TerminalCursorProps> = props => {
+    return <span className={`terminal-cursor ${props.className || ''}`}>|</span>
+}
 
-        return () => clearInterval(intervalId);
-    }, []);
-
-    return <span className={`cursor ${visible ? 'visible' : 'hidden'}`}>|</span>;
-};
-
-export default TerminalCursor;
+export default TerminalCursor

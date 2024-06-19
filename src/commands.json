@@ -97,7 +97,7 @@
         "commands": [
             {
                 "command": "nmap -sV -sC targetsite.com -p- --script=vuln",
-                "description": "Welcome to Box 1! First, we will begin with scanning it for open ports using Nmap. This command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-). The --script=vuln option will run vulnerability scripts to identify potential weaknesses."
+                "description": "Welcome to Box 1!\nFirst, we will begin with scanning it for open ports using Nmap.\nThis command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-).\nThe --script=vuln option will run vulnerability scripts to identify potential weaknesses."
             },
             {
                 "command": "whatweb http://targetsite.com:8080",

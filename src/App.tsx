@@ -8,6 +8,8 @@ function App() {
     const [selectedCommandSet, setSelectedCommandSet] = useState<string>('')
     const [entries, setEntries] = useState<Entries>({})
     const [commandSetMapping, setCommandSetMapping] = useState<{ [key: string]: string }>({})
+    const [isTestRunning, setIsTestRunning] = useState<boolean>(false)
+    const [results, setResults] = useState<{ accuracy: number; duration: number } | null>(null)
 
     useEffect(() => {
         const jsonEntries: Entries = commandsJson
@@ -28,7 +30,13 @@ function App() {
     }
 
     const startTest = () => {
-        setSelectedCommandSet(selectedCommandSet)
+        setIsTestRunning(true)
+        setResults(null) // Reset previous results
+    }
+
+    const handleFinishTest = (accuracy: number, duration: number) => {
+        setIsTestRunning(false)
+        setResults({ accuracy, duration })
     }
 
     return (
@@ -45,11 +53,24 @@ function App() {
                 <button
                     className="rounded-lg bg-blue-700 px-4 py-2 font-bold text-white hover:bg-blue-700"
                     onClick={startTest}
+                    disabled={isTestRunning || !selectedCommandSet}
                 >
                     Start Test
                 </button>
             </div>
-            <Terminal selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}} />
+            <Terminal
+                selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
+                isTestRunning={isTestRunning}
+                onStartTest={startTest}
+                onFinishTest={handleFinishTest}
+            />
+            {results && (
+                <div>
+                    <h2>Test Results</h2>
+                    <p>Accuracy: {results.accuracy}%</p>
+                    <p>Duration: {results.duration} seconds</p>
+                </div>
+            )}
         </div>
     )
 }

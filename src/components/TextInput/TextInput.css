@@ -1,0 +1,52 @@
+.text-input-container {
+    position: relative;
+}
+
+.text-input-display {
+    display: flex;
+    align-items: center;
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+    font-size: 12px;
+    line-height: 1.42;
+    color: white;
+}
+
+.terminal-cursor {
+    display: inline-block;
+    width: 0px;
+    background-color: white;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.correct-char {
+    color: white;
+}
+
+.incorrect-char {
+    color: red;
+}
+
+.bg-char {
+    color: grey;
+    opacity: 0.5;
+}
+
+#input-area {
+    caret-color: white;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+    font-size: 12px;
+    line-height: 1.42;
+}
