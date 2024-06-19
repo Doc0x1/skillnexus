@@ -41,6 +41,11 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                 setCurrentCommand(selectedCommandSet.commands[0].command)
                 setCurrentDescription(selectedCommandSet.commands[0].description)
             }
+        } else {
+            setCurrentCommand('')
+            setCurrentDescription('')
+            setInput('')
+            setCurrentCommandIndex(0)
         }
     }, [isTestRunning, selectedCommandSet])
 
@@ -95,28 +100,22 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
         }
     }
 
-    const checkCommandInput = (updatedInput: string, incorrectChars: number) => {
+    const checkCommandInput = (incorrectChars: number) => {
         const commands = selectedCommandSet?.commands || []
         if (currentCommandIndex < commands.length) {
-            const expectedCommand = commands[currentCommandIndex].command
-            if (updatedInput === expectedCommand) {
-                setCurrentCommandIndex(prev => prev + 1)
-                if (currentCommandIndex + 1 < commands.length) {
-                    setCurrentCommand(commands[currentCommandIndex + 1].command)
-                    setCurrentDescription(commands[currentCommandIndex + 1].description)
-                } else {
-                    setCurrentCommand('')
-                    setCurrentDescription('Select a Test to begin.')
-                    handleFinishTest(totalIncorrectChars)
-                }
-                setInput('')
-                return true
+            setCurrentCommandIndex(prev => prev + 1)
+            // The part below handles switching to the next command
+            if (currentCommandIndex + 1 < commands.length) {
+                setCurrentCommand(commands[currentCommandIndex + 1].command)
+                setCurrentDescription(commands[currentCommandIndex + 1].description)
             } else {
-                setCurrentCommand(expectedCommand)
-                setCurrentDescription(commands[currentCommandIndex].description)
-                setTotalIncorrectChars(prev => prev + incorrectChars)
-                return false
+                // This handles the test completion
+                setCurrentCommand('')
+                setCurrentDescription('Select a Test to begin.')
+                handleFinishTest(totalIncorrectChars)
             }
+            setInput('')
+            setTotalIncorrectChars(prev => prev + incorrectChars)
         }
     }
 
@@ -133,13 +132,25 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
         }
     }
 
-    const handleUserInputChange = (newInput: string, incorrectChars: number, enteredKey = '') => {
+    const handleUserInputChange = (newInput: string, enteredKey = '') => {
         setInput(newInput)
         if (enteredKey === 'Enter') {
-            checkCommandInput(newInput, 0)
-        } else {
-            setTotalIncorrectChars(incorrectChars)
+            const mistakes = getMistakeCount(newInput, currentCommand)
+            checkCommandInput(mistakes)
+            setInput('')
         }
+    }
+
+    const getMistakeCount = (submittedCommand: string, command: string) => {
+        let mistakeCount = 0
+
+        for (let i = 0; i < command.length; i++) {
+            if (submittedCommand[i] !== command[i]) {
+                mistakeCount++
+            }
+        }
+
+        return mistakeCount
     }
 
     const handleTerminalClick = () => {
@@ -195,7 +206,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                 </div>
                 <div className="flex flex-col place-content-between" onClick={handleTerminalClick}>
                     <div className="terminal-line">
-                        <div className="">
+                        <div className="col-start-2">
                             {currentDescription !== '' ? currentDescription : 'Select a Test to begin'}
                         </div>
                     </div>
@@ -215,13 +226,6 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                     </div>
                 </div>
             </div>
-            {/*             <div>
-                DEBUG
-                <div>{input}</div>
-                <div>{currentCommand}</div>
-                <div>{currentCommandIndex}</div>
-                <div>Total Incorrect Chars: {totalIncorrectChars}</div>
-            </div> */}
             <ResultModal
                 testName={selectedCommandSet.name}
                 isOpen={modalIsOpen}

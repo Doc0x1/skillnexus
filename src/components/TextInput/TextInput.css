@@ -1,3 +1,5 @@
+/* TextInput.css */
+
 .text-input-container {
     position: relative;
 }
@@ -44,9 +46,22 @@
 #input-area {
     caret-color: white;
     background: none;
+    height: min-content;
     border: none;
     outline: none;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
     font-size: 12px;
     line-height: 1.42;
+}
+
+/* Correct space styles */
+.correct-space {
+    background-color: transparent; /* Hide the character itself */
+}
+
+/* Incorrect space styles */
+.incorrect-space {
+    background-color: red; /* Hide the character itself */
+    display: inline-block;
+    animation: blink 1s infinite;
 }

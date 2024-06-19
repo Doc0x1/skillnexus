@@ -1,10 +1,10 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import './TextInput.css'
 
 interface TextInputParams {
     currentCommand: string
     userInput: string
-    onUserInputChange: (input: string, incorrectChars: number, enteredKey?: string) => void
+    onUserInputChange: (input: string, enteredKey?: string) => void
     totalIncorrectChars: number
 }
 
@@ -15,7 +15,6 @@ interface TextInputRef extends Partial<HTMLInputElement> {
 export const TextInput = forwardRef<TextInputRef, TextInputParams>(
     ({ currentCommand, userInput, onUserInputChange, totalIncorrectChars }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
-        const [mistakes, setMistakes] = useState<boolean[]>([])
 
         useImperativeHandle(ref, () => ({
             focus: () => {
@@ -32,10 +31,6 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             }
         }, [])
 
-        useEffect(() => {
-            setMistakes(new Array(currentCommand.length).fill(false))
-        }, [currentCommand])
-
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
 
@@ -45,7 +40,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         e.preventDefault()
                         if (userInput.length > 0) {
                             const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput, totalIncorrectChars)
+                            onUserInputChange(newUserInput)
                         }
                         break
                     case 'ArrowLeft':
@@ -54,13 +49,13 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         break
                     case 'Enter':
                         e.preventDefault()
-                        onUserInputChange('', totalIncorrectChars)
+                        onUserInputChange('')
                         break
                     default:
                         if (key.length === 1) {
                             e.preventDefault()
                             const newUserInput = userInput + key
-                            onUserInputChange(newUserInput, totalIncorrectChars)
+                            onUserInputChange(newUserInput)
                         }
                         break
                 }
@@ -70,7 +65,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         e.preventDefault()
                         if (userInput.length > 0) {
                             const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput, totalIncorrectChars)
+                            onUserInputChange(newUserInput)
                         }
                         break
                     case 'ArrowLeft':
@@ -80,26 +75,14 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     case 'Enter':
                         e.preventDefault()
                         if (userInput.length === currentCommand.length) {
-                            onUserInputChange(userInput, totalIncorrectChars, 'Enter')
+                            onUserInputChange(userInput, 'Enter')
                         }
                         break
                     default:
                         if (key.length === 1 && userInput.length < currentCommand.length) {
                             e.preventDefault()
                             const newUserInput = userInput + key
-                            const currentPosition = userInput.length
-                            const incorrectChars =
-                                key !== currentCommand[currentPosition] && !mistakes[currentPosition]
-                                    ? totalIncorrectChars + 1
-                                    : totalIncorrectChars
-
-                            const newMistakes = [...mistakes]
-                            if (key !== currentCommand[currentPosition]) {
-                                newMistakes[currentPosition] = true
-                            }
-
-                            setMistakes(newMistakes)
-                            onUserInputChange(newUserInput, incorrectChars)
+                            onUserInputChange(newUserInput)
                         }
                         break
                 }
@@ -116,10 +99,13 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         const renderTextWithCursor = () => {
             const renderedText = []
             for (let i = 0; i < currentCommand.length; i++) {
+                let charClassCssVar = 'char'
+                if (currentCommand[i] === ' ') charClassCssVar = 'space'
+                else charClassCssVar = 'char'
                 const charClass = userInput[i]
                     ? userInput[i] === currentCommand[i]
-                        ? 'correct-char'
-                        : 'incorrect-char'
+                        ? `correct-${charClassCssVar}`
+                        : `incorrect-${charClassCssVar}`
                     : 'bg-char'
 
                 renderedText.push(
@@ -134,22 +120,27 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
 
         return (
             <div className="text-input-container relative">
-                {currentCommand === '' ? null : <div className="text-input-display">{renderTextWithCursor()}</div>}
-                <input
-                    id="input-area"
-                    ref={inputRef}
-                    type="text"
-                    className={`${
-                        currentCommand === ''
-                            ? 'flex h-auto w-full border-none text-white outline-none'
-                            : 'absolute left-0 top-0 flex h-auto w-full border-none text-transparent outline-none'
-                    }`}
-                    onKeyDown={handleKeyDown}
-                    onMouseDown={handleMouseDown}
-                    autoFocus
-                    value={userInput}
-                    onChange={() => {}}
-                />
+                <div className="text-input-display">
+                    {currentCommand === '' ? null : renderTextWithCursor()}
+                    <input
+                        id="input-area"
+                        ref={inputRef}
+                        spellCheck="false"
+                        minLength={0}
+                        maxLength={currentCommand.length}
+                        type="text"
+                        className={`${
+                            currentCommand === ''
+                                ? 'flex h-auto w-full border-none text-white outline-none'
+                                : 'absolute left-0 top-0 flex w-full border-none text-transparent outline-none'
+                        }`}
+                        onKeyDown={handleKeyDown}
+                        onMouseDown={handleMouseDown}
+                        autoFocus
+                        value={userInput}
+                        onChange={() => {}}
+                    />
+                </div>
             </div>
         )
     }
