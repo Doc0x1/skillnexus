@@ -4,6 +4,7 @@ import { faCircleChevronUp, faMinusCircle, faTimesCircle } from '@fortawesome/fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { CommandSet } from '../types/commandSet'
 import { TextInput } from './TextInput/TextInput'
+import ResultModal from './ResultModal/ResultModal'
 
 interface TerminalProps {
     selectedCommandSet: CommandSet
@@ -19,6 +20,9 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
     const [currentDescription, setCurrentDescription] = useState<string>('')
     const [startTime, setStartTime] = useState<number | null>(null)
     const [totalIncorrectChars, setTotalIncorrectChars] = useState<number>(0)
+    const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
+    const [testDuration, setTestDuration] = useState<number>(0)
+    const [testAccuracy, setTestAccuracy] = useState<number>(0)
 
     const textInputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
@@ -43,19 +47,32 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (isDragging) {
-                setCurrentPosition({
-                    x: e.clientX + offset.x,
-                    y: e.clientY + offset.y,
-                })
+                const newX = e.clientX + offset.x
+                const newY = e.clientY + offset.y
+
+                // Constrain the terminal within window bounds
+                const terminalElement = terminalRef.current
+                if (terminalElement) {
+                    const terminalWidth = terminalElement.offsetWidth
+                    const terminalHeight = terminalElement.offsetHeight
+                    const screenWidth = window.innerWidth
+                    const screenHeight = window.innerHeight
+
+                    const constrainedX = Math.max(0, Math.min(newX, screenWidth - terminalWidth))
+                    const constrainedY = Math.max(0, Math.min(newY, screenHeight - terminalHeight))
+
+                    setCurrentPosition({ x: constrainedX, y: constrainedY })
+                }
             }
         }
+
         document.addEventListener('mousemove', handleMouseMove)
         document.addEventListener('mouseup', handleMouseUp)
         return () => {
             document.removeEventListener('mousemove', handleMouseMove)
             document.removeEventListener('mouseup', handleMouseUp)
         }
-    }, [isDragging, offset.x, offset.y])
+    }, [isDragging, offset])
 
     useEffect(() => {
         centerTerminal()
@@ -90,10 +107,9 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                 } else {
                     setCurrentCommand('')
                     setCurrentDescription('Select a Test to begin.')
-                    handleFinishTest()
+                    handleFinishTest(totalIncorrectChars)
                 }
                 setInput('')
-                setTotalIncorrectChars(prev => prev + incorrectChars)
                 return true
             } else {
                 setCurrentCommand(expectedCommand)
@@ -110,13 +126,17 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         setIsDragging(true)
-        setOffset({ x: currentPosition.x - e.clientX, y: currentPosition.y - e.clientY })
+        const terminalElement = terminalRef.current
+        if (terminalElement) {
+            const rect = terminalElement.getBoundingClientRect()
+            setOffset({ x: rect.left - e.clientX, y: rect.top - e.clientY })
+        }
     }
 
     const handleUserInputChange = (newInput: string, incorrectChars: number, enteredKey = '') => {
         setInput(newInput)
         if (enteredKey === 'Enter') {
-            checkCommandInput(newInput, incorrectChars)
+            checkCommandInput(newInput, 0)
         } else {
             setTotalIncorrectChars(incorrectChars)
         }
@@ -128,14 +148,17 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
         }
     }
 
-    const handleFinishTest = () => {
+    const handleFinishTest = (totalIncorrectChars: number) => {
         const endTime = Date.now()
         const duration = ((endTime - (startTime || 0)) / 1000).toFixed(2) // in seconds
-        const accuracy = calculateAccuracy()
+        const accuracy = calculateAccuracy(totalIncorrectChars)
+        setTestDuration(Number(duration))
+        setTestAccuracy(Number(accuracy))
         onFinishTest(Number(accuracy), Number(duration))
+        setModalIsOpen(true)
     }
 
-    const calculateAccuracy = () => {
+    const calculateAccuracy = (totalIncorrectChars: number) => {
         const totalCharsTyped = input.length + totalIncorrectChars
         const correctChars = input.split('').filter((char, index) => char === currentCommand[index]).length
         return ((correctChars / totalCharsTyped) * 100).toFixed(2) // percentage
@@ -172,7 +195,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                 </div>
                 <div className="flex flex-col place-content-between" onClick={handleTerminalClick}>
                     <div className="terminal-line">
-                        <div className="col-start-2">
+                        <div className="">
                             {currentDescription !== '' ? currentDescription : 'Select a Test to begin'}
                         </div>
                     </div>
@@ -185,19 +208,27 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
                                     currentCommand={currentCommand}
                                     userInput={input}
                                     onUserInputChange={handleUserInputChange}
+                                    totalIncorrectChars={totalIncorrectChars}
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div>
+            {/*             <div>
                 DEBUG
                 <div>{input}</div>
                 <div>{currentCommand}</div>
                 <div>{currentCommandIndex}</div>
                 <div>Total Incorrect Chars: {totalIncorrectChars}</div>
-            </div>
+            </div> */}
+            <ResultModal
+                testName={selectedCommandSet.name}
+                isOpen={modalIsOpen}
+                onRequestClose={() => setModalIsOpen(false)}
+                time={testDuration}
+                accuracy={testAccuracy}
+            />
         </>
     )
 }

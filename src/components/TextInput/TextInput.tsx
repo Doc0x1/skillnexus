@@ -5,6 +5,7 @@ interface TextInputParams {
     currentCommand: string
     userInput: string
     onUserInputChange: (input: string, incorrectChars: number, enteredKey?: string) => void
+    totalIncorrectChars: number
 }
 
 interface TextInputRef extends Partial<HTMLInputElement> {
@@ -12,9 +13,9 @@ interface TextInputRef extends Partial<HTMLInputElement> {
 }
 
 export const TextInput = forwardRef<TextInputRef, TextInputParams>(
-    ({ currentCommand, userInput, onUserInputChange }, ref) => {
+    ({ currentCommand, userInput, onUserInputChange, totalIncorrectChars }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
-        const [incorrectChars, setIncorrectChars] = useState<number>(0)
+        const [mistakes, setMistakes] = useState<boolean[]>([])
 
         useImperativeHandle(ref, () => ({
             focus: () => {
@@ -31,15 +32,20 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             }
         }, [])
 
+        useEffect(() => {
+            setMistakes(new Array(currentCommand.length).fill(false))
+        }, [currentCommand])
+
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
+
             if (currentCommand === '') {
                 switch (key) {
                     case 'Backspace':
                         e.preventDefault()
                         if (userInput.length > 0) {
                             const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput, incorrectChars)
+                            onUserInputChange(newUserInput, totalIncorrectChars)
                         }
                         break
                     case 'ArrowLeft':
@@ -48,13 +54,13 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         break
                     case 'Enter':
                         e.preventDefault()
-                        onUserInputChange('', incorrectChars)
+                        onUserInputChange('', totalIncorrectChars)
                         break
                     default:
                         if (key.length === 1) {
                             e.preventDefault()
                             const newUserInput = userInput + key
-                            onUserInputChange(newUserInput, incorrectChars)
+                            onUserInputChange(newUserInput, totalIncorrectChars)
                         }
                         break
                 }
@@ -64,7 +70,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         e.preventDefault()
                         if (userInput.length > 0) {
                             const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput, incorrectChars)
+                            onUserInputChange(newUserInput, totalIncorrectChars)
                         }
                         break
                     case 'ArrowLeft':
@@ -74,19 +80,26 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     case 'Enter':
                         e.preventDefault()
                         if (userInput.length === currentCommand.length) {
-                            onUserInputChange(userInput, incorrectChars, 'Enter')
+                            onUserInputChange(userInput, totalIncorrectChars, 'Enter')
                         }
                         break
                     default:
                         if (key.length === 1 && userInput.length < currentCommand.length) {
                             e.preventDefault()
                             const newUserInput = userInput + key
-                            if (key !== currentCommand[userInput.length]) {
-                                setIncorrectChars(prev => prev + 1)
-                                onUserInputChange(newUserInput, incorrectChars + 1)
-                            } else {
-                                onUserInputChange(newUserInput, incorrectChars)
+                            const currentPosition = userInput.length
+                            const incorrectChars =
+                                key !== currentCommand[currentPosition] && !mistakes[currentPosition]
+                                    ? totalIncorrectChars + 1
+                                    : totalIncorrectChars
+
+                            const newMistakes = [...mistakes]
+                            if (key !== currentCommand[currentPosition]) {
+                                newMistakes[currentPosition] = true
                             }
+
+                            setMistakes(newMistakes)
+                            onUserInputChange(newUserInput, incorrectChars)
                         }
                         break
                 }
@@ -118,12 +131,6 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
 
             return renderedText
         }
-
-        useEffect(() => {
-            if (userInput === '') {
-                setIncorrectChars(0)
-            }
-        }, [userInput])
 
         return (
             <div className="text-input-container relative">

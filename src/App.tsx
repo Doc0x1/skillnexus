@@ -34,6 +34,10 @@ function App() {
         setResults(null) // Reset previous results
     }
 
+    const stopTest = () => {
+        setIsTestRunning(false)
+    }
+
     const handleFinishTest = (accuracy: number, duration: number) => {
         setIsTestRunning(false)
         setResults({ accuracy, duration })
@@ -41,8 +45,14 @@ function App() {
 
     return (
         <div className="App">
-            <div className="flex flex-col items-center justify-center gap-2 pt-4 text-center">
-                <select id="test-select" value={selectedCommandSet} onChange={handleSelectChange}>
+            <div className="control-panel">
+                <select
+                    id="test-select"
+                    value={selectedCommandSet}
+                    onChange={handleSelectChange}
+                    className="control-element"
+                    disabled={isTestRunning}
+                >
                     <option value="">Select Test</option>
                     {Object.entries(entries).map(([commands, { value }]) => (
                         <option key={value} value={value}>
@@ -50,13 +60,19 @@ function App() {
                         </option>
                     ))}
                 </select>
-                <button
-                    className="rounded-lg bg-blue-700 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                    onClick={startTest}
-                    disabled={isTestRunning || !selectedCommandSet}
-                >
-                    Start Test
-                </button>
+                {isTestRunning ? (
+                    <button className="stop-test-button control-element" onClick={stopTest}>
+                        Stop Test
+                    </button>
+                ) : (
+                    <button
+                        className="start-test-button control-element"
+                        onClick={startTest}
+                        disabled={!selectedCommandSet}
+                    >
+                        Start Test
+                    </button>
+                )}
             </div>
             <Terminal
                 selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
@@ -65,7 +81,7 @@ function App() {
                 onFinishTest={handleFinishTest}
             />
             {results && (
-                <div>
+                <div className="result-modal">
                     <h2>Test Results</h2>
                     <p>Accuracy: {results.accuracy}%</p>
                     <p>Duration: {results.duration} seconds</p>

@@ -83,8 +83,18 @@ ul li {
 }
 
 .terminal-line {
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-right: 10%;
+    padding-left: 10%;
+    word-wrap: normal;
+    word-break: break-all;
+    word-spacing: normal;
+    font-stretch: semi-condensed;
     line-height: 2;
     white-space: pre-wrap;
+    text-align: center;
 }
 
 .terminal-prompt {

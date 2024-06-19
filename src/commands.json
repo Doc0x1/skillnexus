@@ -1,5 +1,6 @@
 {
-    "linux": {
+    "Linux Commands": {
+        "name": "Linux Commands Test",
         "value": "linux-terminal",
         "prompt": "root@kali:~#",
         "commands": [
@@ -45,7 +46,8 @@
             }
         ]
     },
-    "pentesting": {
+    "Pentesting Commands": {
+        "name": "Pentesting Commands Test",
         "value": "linux-terminal-pentesting",
         "prompt": "root@kali:~#",
         "commands": [
@@ -92,6 +94,7 @@
         ]
     },
     "Box1 Walkthrough": {
+        "name": "Box1 Walkthrough",
         "value": "linux-terminal-box1",
         "prompt": "root@kali:~#",
         "commands": [
