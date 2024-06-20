@@ -8,25 +8,28 @@
     display: flex;
     align-items: center;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
-    font-size: 12px;
     line-height: 1.42;
-    color: white;
+}
+
+.empty-input-line {
+    font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+    line-height: 1.42;
 }
 
 .terminal-cursor {
     display: inline-block;
     width: 0px;
     background-color: white;
-    animation: blink 1s infinite;
+    animation: blink 1s step-start infinite;
 }
 
 @keyframes blink {
     0%,
     100% {
-        opacity: 0;
+        opacity: 1;
     }
     50% {
-        opacity: 1;
+        opacity: 0;
     }
 }
 
@@ -50,8 +53,8 @@
     border: none;
     outline: none;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
-    font-size: 12px;
     line-height: 1.42;
+    font-size: medium;
 }
 
 /* Correct space styles */
@@ -61,7 +64,7 @@
 
 /* Incorrect space styles */
 .incorrect-space {
-    background-color: red; /* Hide the character itself */
-    display: inline-block;
-    animation: blink 1s infinite;
+    color: red; /* Hide the character itself */
+    content: '_';
+    opacity: 0.8;
 }

@@ -6,6 +6,7 @@ import commandsJson from './commands.json'
 
 function App() {
     const [selectedCommandSet, setSelectedCommandSet] = useState<string>('')
+    const [commandSetName, setCommandSetName] = useState<string>('No Test Selected')
     const [entries, setEntries] = useState<Entries>({})
     const [commandSetMapping, setCommandSetMapping] = useState<{ [key: string]: string }>({})
     const [isTestRunning, setIsTestRunning] = useState<boolean>(false)
@@ -13,7 +14,7 @@ function App() {
 
     useEffect(() => {
         const jsonEntries: Entries = commandsJson
-        setEntries(jsonEntries)
+        setEntries(jsonEntries as Entries)
 
         const mapping: { [key: string]: string } = {}
         for (const key in jsonEntries) {
@@ -25,13 +26,19 @@ function App() {
         setCommandSetMapping(mapping)
     }, [])
 
+    useEffect(() => {
+        if (selectedCommandSet !== '') {
+            setCommandSetName(entries[commandSetMapping[selectedCommandSet]].name)
+        }
+    }, [selectedCommandSet, commandSetMapping, entries])
+
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCommandSet(e.target.value)
     }
 
     const startTest = () => {
         setIsTestRunning(true)
-        setResults(null) // Reset previous results
+        //setResults(null) // Reset previous results
     }
 
     const stopTest = () => {
@@ -39,8 +46,8 @@ function App() {
     }
 
     const handleFinishTest = (accuracy: number, duration: number) => {
-        setIsTestRunning(false)
         setResults({ accuracy, duration })
+        setIsTestRunning(false)
     }
 
     return (
@@ -53,7 +60,12 @@ function App() {
                     className="control-element"
                     disabled={isTestRunning}
                 >
-                    <option value="">Select Test</option>
+                    <option value="" unselectable="on">
+                        Select Test
+                    </option>
+                    <option value="" disabled>
+                        -----
+                    </option>
                     {Object.entries(entries).map(([commands, { value }]) => (
                         <option key={value} value={value}>
                             {commands}
@@ -74,17 +86,27 @@ function App() {
                     </button>
                 )}
             </div>
+
             <Terminal
                 selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
                 isTestRunning={isTestRunning}
                 onStartTest={startTest}
+                onStopTest={stopTest}
                 onFinishTest={handleFinishTest}
             />
-            {results && (
-                <div className="result-modal">
-                    <h2>Test Results</h2>
-                    <p>Accuracy: {results.accuracy}%</p>
-                    <p>Duration: {results.duration} seconds</p>
+            {results ? (
+                <div className="result-modal mt-4">
+                    <div className="text-xl font-bold">Previous Results</div>
+                    <hr className="border-green-600" />
+                    <div className="pb-1 pt-1 text-center text-lg font-bold">{commandSetName}</div>
+                    <div className="pl-[10px] text-left text-base font-medium">Accuracy: {results.accuracy}%</div>
+                    <div className="pl-[10px] text-left text-base font-medium">Duration: {results.duration}s</div>
+                </div>
+            ) : (
+                <div className="mt-4 text-center">
+                    Welcome to Skill Nexus!
+                    <br />
+                    We will be adding more features as time goes on, but for now, enjoy the Terminal!
                 </div>
             )}
         </div>

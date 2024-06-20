@@ -10,10 +10,11 @@ interface TerminalProps {
     selectedCommandSet: CommandSet
     isTestRunning: boolean
     onStartTest: () => void
+    onStopTest: () => void
     onFinishTest: (accuracy: number, duration: number) => void
 }
 
-export default function Terminal({ selectedCommandSet, isTestRunning, onStartTest, onFinishTest }: TerminalProps) {
+export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTest }: TerminalProps) {
     const [input, setInput] = useState<string>('')
     const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
     const [currentCommand, setCurrentCommand] = useState<string>('')
@@ -24,6 +25,9 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
     const [testDuration, setTestDuration] = useState<number>(0)
     const [testAccuracy, setTestAccuracy] = useState<number>(0)
 
+    const [elapsedTime, setElapsedTime] = useState<number>(0)
+    const [commandHistory, setCommandHistory] = useState<string[]>([])
+
     const textInputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -32,22 +36,32 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
     const [offset, setOffset] = useState({ x: 0, y: 0 })
 
     useEffect(() => {
+        let timer: NodeJS.Timeout
+
         if (isTestRunning) {
             setStartTime(Date.now())
             setInput('')
             setTotalIncorrectChars(0)
             setCurrentCommandIndex(0)
-            if (selectedCommandSet?.commands?.length > 0) {
+            setCommandHistory([])
+            if (selectedCommandSet.commands.length > 0) {
                 setCurrentCommand(selectedCommandSet.commands[0].command)
                 setCurrentDescription(selectedCommandSet.commands[0].description)
             }
+            if (textInputRef.current) {
+                textInputRef.current.focus()
+            }
+            timer = setInterval(() => {
+                setElapsedTime((Date.now() - (startTime || 0)) / 1000)
+            }, 10)
         } else {
-            setCurrentCommand('')
-            setCurrentDescription('')
-            setInput('')
-            setCurrentCommandIndex(0)
+            cleanupInputLine()
         }
-    }, [isTestRunning, selectedCommandSet])
+
+        return () => {
+            if (timer) clearInterval(timer)
+        }
+    }, [isTestRunning, selectedCommandSet, testDuration, testAccuracy, startTime])
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -103,20 +117,33 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
     const checkCommandInput = (incorrectChars: number) => {
         const commands = selectedCommandSet?.commands || []
         if (currentCommandIndex < commands.length) {
+            if (commandHistory.length > 3) {
+                commandHistory.shift()
+            }
+            setCommandHistory(prev => [...prev, input])
             setCurrentCommandIndex(prev => prev + 1)
             // The part below handles switching to the next command
-            if (currentCommandIndex + 1 < commands.length) {
+            if (currentCommandIndex + 1 < commands.length && isTestRunning) {
                 setCurrentCommand(commands[currentCommandIndex + 1].command)
                 setCurrentDescription(commands[currentCommandIndex + 1].description)
             } else {
                 // This handles the test completion
-                setCurrentCommand('')
-                setCurrentDescription('Select a Test to begin.')
                 handleFinishTest(totalIncorrectChars)
+                setCurrentCommand('')
+                setCurrentDescription('')
             }
-            setInput('')
             setTotalIncorrectChars(prev => prev + incorrectChars)
         }
+    }
+
+    const cleanupInputLine = () => {
+        setCommandHistory([])
+        setStartTime(0)
+        setElapsedTime(0)
+        setCurrentCommandIndex(0)
+        setCurrentCommand('')
+        setCurrentDescription('')
+        setInput('')
     }
 
     const handleMouseUp = () => {
@@ -134,7 +161,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
 
     const handleUserInputChange = (newInput: string, enteredKey = '') => {
         setInput(newInput)
-        if (enteredKey === 'Enter') {
+        if (enteredKey === 'Enter' && isTestRunning) {
             const mistakes = getMistakeCount(newInput, currentCommand)
             checkCommandInput(mistakes)
             setInput('')
@@ -188,35 +215,83 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onStartTes
             >
                 <div className="top-bar" id="drag-handle" onMouseDown={handleMouseDown}>
                     <div className="title-bar">
-                        <p className="title">root@linux:~</p>
-                        <ul className="top-btn">
+                        <ul className="menu-bar flex justify-start">
+                            <li>File</li>
+                            <li>Edit</li>
+                            <li>View</li>
+                            <li>Search</li>
+                            <li>Terminal</li>
+                            <li>Help</li>
+                        </ul>
+                        <p className="flex justify-center text-lg font-bold">Terminal</p>
+                        <ul className="top-btn flex justify-end gap-1">
                             <FontAwesomeIcon icon={faMinusCircle} />
                             <FontAwesomeIcon icon={faCircleChevronUp} />
                             <FontAwesomeIcon icon={faTimesCircle} />
                         </ul>
                     </div>
-                    <ul className="menu-bar">
-                        <li>File</li>
-                        <li>Edit</li>
-                        <li>View</li>
-                        <li>Search</li>
-                        <li>Terminal</li>
-                        <li>Help</li>
-                    </ul>
                 </div>
                 <div className="flex flex-col place-content-between" onClick={handleTerminalClick}>
-                    <div className="terminal-line">
-                        <div className="col-start-2">
-                            {currentDescription !== '' ? currentDescription : 'Select a Test to begin'}
+                    <div>
+                        <br />
+                        <div className="mx-2 grid columns-3 grid-cols-3">
+                            <div className="text-start text-lg font-bold text-sky-400">
+                                <span>
+                                    Command Progress:&nbsp;
+                                    {(isTestRunning && selectedCommandSet.commands.length - currentCommandIndex) || 0}
+                                </span>
+                            </div>
+                            <div className="test-lg text-center font-bold text-red-500">
+                                {selectedCommandSet.name ? (
+                                    <span>{selectedCommandSet.name}</span>
+                                ) : (
+                                    <a
+                                        className="terminal-link"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        href="https://discord.gg/hacknexus"
+                                    >
+                                        Discord.gg/HackNexus
+                                    </a>
+                                )}
+                            </div>
+                            <div className="terminal-timer text-end text-lg font-bold text-sky-400">
+                                <span>Timer: {elapsedTime.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <br />
+                        <hr />
+                        <div className="terminal-line">
+                            <div className={`col-start-2 ${isTestRunning ? 'text-left' : ''}`}>
+                                {isTestRunning
+                                    ? currentDescription
+                                    : 'Information about each command you are typing will be displayed here as you progress.'}
+                            </div>
                         </div>
                     </div>
-                    <div className="items-baseline text-left">
-                        <div className="terminal-prompt flex items-baseline text-left">
+
+                    <div className="flex flex-col items-baseline gap-2 pb-2 pl-4 text-left">
+                        {
+                            // ? Below handles the command history being displayed
+                        }
+                        <div className="terminal-history flex flex-col gap-2">
+                            {commandHistory.map((cmd, index) => (
+                                <div key={index} className="terminal-command">
+                                    <span className="terminal-user text-red-500">root@linux:~$&nbsp;</span>
+                                    {cmd}
+                                </div>
+                            ))}
+                        </div>
+                        {
+                            // ? Below handles displaying user input as they type the commands
+                        }
+                        <div className="terminal-command flex items-baseline text-left">
                             <span className="terminal-user text-red-500">root@linux:~$&nbsp;</span>
                             <div className="terminal-prompt-input flex place-items-baseline">
                                 <TextInput
                                     ref={textInputRef}
                                     currentCommand={currentCommand}
+                                    isTestRunning={isTestRunning}
                                     userInput={input}
                                     onUserInputChange={handleUserInputChange}
                                     totalIncorrectChars={totalIncorrectChars}

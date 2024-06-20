@@ -1,9 +1,10 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import './TextInput.css'
 
 interface TextInputParams {
     currentCommand: string
     userInput: string
+    isTestRunning: boolean
     onUserInputChange: (input: string, enteredKey?: string) => void
     totalIncorrectChars: number
 }
@@ -13,7 +14,7 @@ interface TextInputRef extends Partial<HTMLInputElement> {
 }
 
 export const TextInput = forwardRef<TextInputRef, TextInputParams>(
-    ({ currentCommand, userInput, onUserInputChange, totalIncorrectChars }, ref) => {
+    ({ currentCommand, userInput, isTestRunning, onUserInputChange }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
 
         useImperativeHandle(ref, () => ({
@@ -24,12 +25,6 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             },
             ...inputRef.current,
         }))
-
-        useEffect(() => {
-            if (inputRef.current) {
-                inputRef.current.focus()
-            }
-        }, [])
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
@@ -49,14 +44,10 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         break
                     case 'Enter':
                         e.preventDefault()
-                        onUserInputChange('')
+                        onUserInputChange(userInput, 'Enter')
                         break
                     default:
-                        if (key.length === 1) {
-                            e.preventDefault()
-                            const newUserInput = userInput + key
-                            onUserInputChange(newUserInput)
-                        }
+                        e.preventDefault()
                         break
                 }
             } else {
@@ -79,7 +70,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         }
                         break
                     default:
-                        if (key.length === 1 && userInput.length < currentCommand.length) {
+                        if (key.length === 1 && userInput.length < currentCommand.length && isTestRunning) {
                             e.preventDefault()
                             const newUserInput = userInput + key
                             onUserInputChange(newUserInput)
@@ -96,8 +87,11 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             }
         }
 
-        const renderTextWithCursor = () => {
-            const renderedText = []
+        const renderInputElements = () => {
+            const renderedText: JSX.Element[] = []
+            if (!isTestRunning) {
+                return []
+            }
             for (let i = 0; i < currentCommand.length; i++) {
                 let charClassCssVar = 'char'
                 if (currentCommand[i] === ' ') charClassCssVar = 'space'
@@ -119,27 +113,24 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         }
 
         return (
-            <div className="text-input-container relative">
-                <div className="text-input-display">
-                    {currentCommand === '' ? null : renderTextWithCursor()}
+            <div className="text-input-container">
+                <div className="text-input-display relative whitespace-pre font-mono">
+                    {isTestRunning && renderInputElements()}
                     <input
                         id="input-area"
                         ref={inputRef}
                         spellCheck="false"
                         minLength={0}
-                        maxLength={currentCommand.length}
                         type="text"
-                        className={`${
-                            currentCommand === ''
-                                ? 'flex h-auto w-full border-none text-white outline-none'
-                                : 'absolute left-0 top-0 flex w-full border-none text-transparent outline-none'
-                        }`}
+                        className={`absolute flex border-none text-transparent
+                        outline-none ${isTestRunning ? 'w-full' : 'w-4'}`}
                         onKeyDown={handleKeyDown}
                         onMouseDown={handleMouseDown}
                         autoFocus
                         value={userInput}
                         onChange={() => {}}
                     />
+                    {!isTestRunning && <div className="text-input-display relative text-transparent">1</div>}
                 </div>
             </div>
         )

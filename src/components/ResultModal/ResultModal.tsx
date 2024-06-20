@@ -22,12 +22,17 @@ const ResultModal: React.FC<ResultModalProps> = ({ testName, isOpen, onRequestCl
             overlayClassName="overlay"
             contentLabel="Test Complete"
         >
-            <div className="modal-content">
-                <h2 className="">{testName} Complete!</h2>
-                <p className="pb-1 text-base font-bold">You finished the test in: {time.toFixed(2)} seconds</p>
-                <p className="font-bold">Accuracy: {accuracy.toFixed(2)}%</p>
-                <button className="close-button" onClick={onRequestClose}>
-                    Close
+            <div className="inline-flex flex-col items-center">
+                <h1 className="flex-nowrap text-3xl font-semibold">{testName} Complete!</h1>
+                <br />
+                <div className="font-mono text-lg font-medium">Completion Time: {time.toFixed(2)} seconds</div>
+                <div className="font-mono text-lg font-medium">Accuracy Percentage: {accuracy.toFixed(2)}%</div>
+                <br />
+                <button
+                    className="cursor-pointer rounded-lg border-2 border-red-600 px-3 py-2 font-mono text-red-400 hover:bg-red-600 hover:text-red-200"
+                    onClick={onRequestClose}
+                >
+                    Close Results
                 </button>
             </div>
         </Modal>
