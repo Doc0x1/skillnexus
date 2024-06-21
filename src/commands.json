@@ -1,8 +1,8 @@
 {
-    "Linux Commands": {
-        "name": "Practice Linux Commands",
-        "value": "linux-terminal",
-        "prompt": "root@kali:~#",
+    "Linux Commands - Beginner": {
+        "name": "Beginner Linux Commands",
+        "value": "linux-terminal-beginner",
+        "type": "Linux-Commands",
         "commands": [
             {
                 "command": "ls -l",
@@ -46,10 +46,104 @@
             }
         ]
     },
+    "Linux Commands - Intermediate": {
+        "name": "Intermediate Linux Commands",
+        "value": "linux-terminal-intermediate",
+        "type": "Linux-Commands",
+        "commands": [
+            {
+                "command": "find /home/user -name '*.txt'",
+                "description": "Finds all .txt files in the /home/user directory."
+            },
+            {
+                "command": "grep 'pattern' file.txt",
+                "description": "Searches for 'pattern' in file.txt."
+            },
+            {
+                "command": "tar -czvf archive.tar.gz /path/to/directory",
+                "description": "Creates a compressed tarball archive of the specified directory."
+            },
+            {
+                "command": "chmod 755 script.sh",
+                "description": "Changes permissions of script.sh to rwxr-xr-x."
+            },
+            {
+                "command": "chown user:group file.txt",
+                "description": "Changes the owner and group of file.txt."
+            },
+            {
+                "command": "ps aux | grep 'process'",
+                "description": "Displays processes matching 'process'."
+            },
+            {
+                "command": "du -h /path/to/directory",
+                "description": "Displays the disk usage of the specified directory in human-readable format."
+            },
+            {
+                "command": "df -h",
+                "description": "Displays disk space usage of all mounted filesystems in human-readable format."
+            },
+            {
+                "command": "curl -O http://example.com/file.txt",
+                "description": "Downloads file.txt from the specified URL."
+            },
+            {
+                "command": "wget http://example.com/file.txt",
+                "description": "Downloads file.txt from the specified URL using wget."
+            }
+        ]
+    },
+    "Linux Commands - Advanced": {
+        "name": "Advanced Linux Commands",
+        "value": "linux-terminal-advanced",
+        "type": "Linux-Commands",
+        "commands": [
+            {
+                "command": "iptables -L",
+                "description": "Lists all current iptables rules."
+            },
+            {
+                "command": "systemctl restart apache2",
+                "description": "Restarts the Apache2 service."
+            },
+            {
+                "command": "mount /dev/sdb1 /mnt/usb",
+                "description": "Mounts the /dev/sdb1 partition to the /mnt/usb directory."
+            },
+            {
+                "command": "umount /mnt/usb",
+                "description": "Unmounts the /mnt/usb directory."
+            },
+            {
+                "command": "ssh user@host",
+                "description": "Initiates an SSH session with the specified host."
+            },
+            {
+                "command": "rsync -avz /source/dir /destination/dir",
+                "description": "Synchronizes files from source directory to destination directory using rsync."
+            },
+            {
+                "command": "crontab -e",
+                "description": "Edits the current user's crontab file."
+            },
+            {
+                "command": "top",
+                "description": "Displays real-time system resource usage."
+            },
+            {
+                "command": "htop",
+                "description": "Displays an interactive process viewer (if installed)."
+            },
+            {
+                "command": "journalctl -xe",
+                "description": "Displays detailed logs of the systemd journal."
+            }
+        ]
+    },
     "Pentesting Commands": {
         "name": "Practice Pentesting Commands",
         "value": "linux-terminal-pentesting",
-        "prompt": "root@kali:~#",
+        "type": "Pentesting-Commands",
         "commands": [
             {
                 "command": "nmap -sS -p 1-65535 target",
@@ -96,7 +190,7 @@
     "Box1 Walkthrough": {
         "name": "Practice Box Commands",
         "value": "linux-terminal-box1",
-        "prompt": "root@kali:~#",
+        "type": "Box-Walkthroughs",
         "commands": [
             {
                 "command": "nmap -sV -sC targetsite.com -p- --script=vuln",

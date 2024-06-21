@@ -113,25 +113,22 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         }
 
         return (
-            <div className="text-input-container">
-                <div className="text-input-display relative whitespace-pre font-mono">
-                    {isTestRunning && renderInputElements()}
-                    <input
-                        id="input-area"
-                        ref={inputRef}
-                        spellCheck="false"
-                        minLength={0}
-                        type="text"
-                        className={`absolute flex border-none text-transparent
-                        outline-none ${isTestRunning ? 'w-full' : 'w-4'}`}
-                        onKeyDown={handleKeyDown}
-                        onMouseDown={handleMouseDown}
-                        autoFocus
-                        value={userInput}
-                        onChange={() => {}}
-                    />
-                    {!isTestRunning && <div className="text-input-display relative text-transparent">1</div>}
-                </div>
+            <div className="text-input-display relative whitespace-pre font-mono">
+                <input
+                    id="input-area"
+                    ref={inputRef}
+                    spellCheck="false"
+                    minLength={0}
+                    type="text"
+                    className={`flex border-none text-transparent
+                        outline-none ${isTestRunning ? 'absolute w-full' : 'w-4'}`}
+                    onKeyDown={handleKeyDown}
+                    onMouseDown={handleMouseDown}
+                    autoFocus
+                    value={userInput}
+                    onChange={() => {}}
+                />
+                {isTestRunning && renderInputElements()}
             </div>
         )
     }

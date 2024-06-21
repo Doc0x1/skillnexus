@@ -1,10 +1,16 @@
-/* App.css */
-
 /* General styles */
 body {
     background-color: #121212;
     color: #00ff00;
     font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    height: 100%;
+}
+
+html,
+body,
+#root {
+    height: 100%;
 }
 
 /* Center the main app container */
@@ -13,8 +19,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    height: 100vh;
-    padding-top: 20px;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
 }
 
 /* Container for the select and button */

@@ -6,7 +6,7 @@ export interface Command {
 export interface CommandSet {
     name: string
     value: string
-    prompt: string
+    type: string
     commands: Command[]
 }
 

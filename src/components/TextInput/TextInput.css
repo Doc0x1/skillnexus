@@ -8,12 +8,10 @@
     display: flex;
     align-items: center;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
-    line-height: 1.42;
 }
 
 .empty-input-line {
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
-    line-height: 1.42;
 }
 
 .terminal-cursor {
@@ -53,7 +51,6 @@
     border: none;
     outline: none;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
-    line-height: 1.42;
     font-size: medium;
 }
 

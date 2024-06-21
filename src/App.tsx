@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import Terminal from './components/Terminal'
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator'
 import { Entries } from './types/commandSet'
 import commandsJson from './commands.json'
 
 function App() {
+    const [isLoading, setIsLoading] = useState<boolean>(true)
     const [selectedCommandSet, setSelectedCommandSet] = useState<string>('')
     const [commandSetName, setCommandSetName] = useState<string>('No Test Selected')
     const [entries, setEntries] = useState<Entries>({})
     const [commandSetMapping, setCommandSetMapping] = useState<{ [key: string]: string }>({})
     const [isTestRunning, setIsTestRunning] = useState<boolean>(false)
     const [results, setResults] = useState<{ accuracy: number; duration: number } | null>(null)
+
+    useEffect(() => {
+        const bgImage = new Image()
+        bgImage.src = `${process.env.PUBLIC_URL}/background.jpg`
+        bgImage.onload = () => {
+            setIsLoading(false)
+        }
+    }, [])
 
     useEffect(() => {
         const jsonEntries: Entries = commandsJson
@@ -38,7 +48,6 @@ function App() {
 
     const startTest = () => {
         setIsTestRunning(true)
-        //setResults(null) // Reset previous results
     }
 
     const stopTest = () => {
@@ -50,8 +59,23 @@ function App() {
         setIsTestRunning(false)
     }
 
+    if (isLoading) {
+        return <LoadingIndicator />
+    }
+
+    const groupedEntries = Object.entries(entries).reduce(
+        (acc, [key, value]) => {
+            if (!acc[value.type]) {
+                acc[value.type] = []
+            }
+            acc[value.type].push([key, value])
+            return acc
+        },
+        {} as { [key: string]: [string, { name: string; value: string; type: string }][] }
+    )
+
     return (
-        <div className="App">
+        <div className="App" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/background.jpg)` }}>
             <div className="control-panel">
                 <select
                     id="test-select"
@@ -63,13 +87,14 @@ function App() {
                     <option value="" unselectable="on">
                         Select Test
                     </option>
-                    <option value="" disabled>
-                        -----
-                    </option>
-                    {Object.entries(entries).map(([commands, { value }]) => (
-                        <option key={value} value={value}>
-                            {commands}
-                        </option>
+                    {Object.keys(groupedEntries).map(type => (
+                        <optgroup key={type} label={type.replace(/-/g, ' ')}>
+                            {groupedEntries[type].map(([commands, { value }]) => (
+                                <option key={value} value={value}>
+                                    {commands}
+                                </option>
+                            ))}
+                        </optgroup>
                     ))}
                 </select>
                 {isTestRunning ? (

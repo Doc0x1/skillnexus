@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 body {
-    background: url('/public/background.jpg') no-repeat center center fixed;
+    background-color: black; /* Fallback color */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;

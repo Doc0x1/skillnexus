@@ -276,9 +276,9 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                         }
                         <div className="terminal-history flex flex-col gap-2">
                             {commandHistory.map((cmd, index) => (
-                                <div key={index} className="terminal-command">
-                                    <span className="terminal-user text-red-500">root@linux:~$&nbsp;</span>
-                                    {cmd}
+                                <div key={index} className="terminal-command flex items-baseline text-left">
+                                    <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
+                                    <div className="flex place-items-baseline">{cmd}</div>
                                 </div>
                             ))}
                         </div>
@@ -286,7 +286,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                             // ? Below handles displaying user input as they type the commands
                         }
                         <div className="terminal-command flex items-baseline text-left">
-                            <span className="terminal-user text-red-500">root@linux:~$&nbsp;</span>
+                            <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
                             <div className="terminal-prompt-input flex place-items-baseline">
                                 <TextInput
                                     ref={textInputRef}
