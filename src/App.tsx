@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './App.css'
 import Terminal from './components/Terminal'
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator'
+import XFCEMenuBar from './components/XFCEMenuBar/XFCEMenuBar'
 import { Entries } from './types/commandSet'
 import commandsJson from './commands.json'
 
@@ -76,40 +77,15 @@ function App() {
 
     return (
         <div className="App" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/background.jpg)` }}>
-            <div className="control-panel">
-                <select
-                    id="test-select"
-                    value={selectedCommandSet}
-                    onChange={handleSelectChange}
-                    className="control-element"
-                    disabled={isTestRunning}
-                >
-                    <option value="" unselectable="on">
-                        Select Test
-                    </option>
-                    {Object.keys(groupedEntries).map(type => (
-                        <optgroup key={type} label={type.replace(/-/g, ' ')}>
-                            {groupedEntries[type].map(([commands, { value }]) => (
-                                <option key={value} value={value}>
-                                    {commands}
-                                </option>
-                            ))}
-                        </optgroup>
-                    ))}
-                </select>
-                {isTestRunning ? (
-                    <button className="stop-test-button control-element" onClick={stopTest}>
-                        Stop Test
-                    </button>
-                ) : (
-                    <button
-                        className="start-test-button control-element"
-                        onClick={startTest}
-                        disabled={!selectedCommandSet}
-                    >
-                        Start Test
-                    </button>
-                )}
+            <div className="w-full text-center">
+                <XFCEMenuBar
+                    selectedCommandSet={selectedCommandSet}
+                    handleSelectChange={handleSelectChange}
+                    isTestRunning={isTestRunning}
+                    startTest={startTest}
+                    stopTest={stopTest}
+                    groupedEntries={groupedEntries}
+                />
             </div>
 
             <Terminal

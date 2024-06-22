@@ -114,25 +114,27 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
         }
     }
 
-    const checkCommandInput = (incorrectChars: number) => {
+    const checkCommandInput = (updatedInput: string, incorrectChars: number) => {
         const commands = selectedCommandSet?.commands || []
         if (currentCommandIndex < commands.length) {
-            if (commandHistory.length > 3) {
-                commandHistory.shift()
+            const expectedCommand = commands[currentCommandIndex].command
+            if (updatedInput === expectedCommand) {
+                setCurrentCommandIndex(prev => prev + 1)
+                // The part below handles switching to the next command
+                if (currentCommandIndex + 1 < commands.length && isTestRunning) {
+                    setCurrentCommand(commands[currentCommandIndex + 1].command)
+                    setCurrentDescription(commands[currentCommandIndex + 1].description)
+                    setCommandHistory(prev => [...prev, input])
+                    if (commandHistory.length > 3) {
+                        commandHistory.shift()
+                    }
+                } else {
+                    // This handles the test completion
+                    setCurrentCommand('')
+                    setCurrentDescription('')
+                    handleFinishTest(totalIncorrectChars)
+                }
             }
-            setCommandHistory(prev => [...prev, input])
-            setCurrentCommandIndex(prev => prev + 1)
-            // The part below handles switching to the next command
-            if (currentCommandIndex + 1 < commands.length && isTestRunning) {
-                setCurrentCommand(commands[currentCommandIndex + 1].command)
-                setCurrentDescription(commands[currentCommandIndex + 1].description)
-            } else {
-                // This handles the test completion
-                handleFinishTest(totalIncorrectChars)
-                setCurrentCommand('')
-                setCurrentDescription('')
-            }
-            setTotalIncorrectChars(prev => prev + incorrectChars)
         }
     }
 
@@ -159,25 +161,15 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
         }
     }
 
-    const handleUserInputChange = (newInput: string, enteredKey = '') => {
+    const handleUserInputChange = (newInput: string, mistakes = 0, enteredKey = '') => {
         setInput(newInput)
+        setTotalIncorrectChars(prev => prev + mistakes)
         if (enteredKey === 'Enter' && isTestRunning) {
-            const mistakes = getMistakeCount(newInput, currentCommand)
-            checkCommandInput(mistakes)
+            checkCommandInput(newInput, 0)
             setInput('')
+        } else {
+            setTotalIncorrectChars(mistakes)
         }
-    }
-
-    const getMistakeCount = (submittedCommand: string, command: string) => {
-        let mistakeCount = 0
-
-        for (let i = 0; i < command.length; i++) {
-            if (submittedCommand[i] !== command[i]) {
-                mistakeCount++
-            }
-        }
-
-        return mistakeCount
     }
 
     const handleTerminalClick = () => {
@@ -241,18 +233,11 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                                     {(isTestRunning && selectedCommandSet.commands.length - currentCommandIndex) || 0}
                                 </span>
                             </div>
-                            <div className="test-lg text-center font-bold text-red-500">
+                            <div className="whitespace-pre text-center text-lg font-bold text-red-500">
                                 {selectedCommandSet.name ? (
                                     <span>{selectedCommandSet.name}</span>
                                 ) : (
-                                    <a
-                                        className="terminal-link"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        href="https://discord.gg/hacknexus"
-                                    >
-                                        Discord.gg/HackNexus
-                                    </a>
+                                    <span>Select a test from the System's Menu Bar</span>
                                 )}
                             </div>
                             <div className="terminal-timer text-end text-lg font-bold text-sky-400">
@@ -262,7 +247,9 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                         <br />
                         <hr />
                         <div className="terminal-line">
-                            <div className={`col-start-2 ${isTestRunning ? 'text-left' : ''}`}>
+                            <div
+                                className={`col-start-2 text-lg font-extrabold text-green-400 opacity-100 ${isTestRunning ? 'text-left' : ''}`}
+                            >
                                 {isTestRunning
                                     ? currentDescription
                                     : 'Information about each command you are typing will be displayed here as you progress.'}

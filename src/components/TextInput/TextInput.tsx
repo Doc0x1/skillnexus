@@ -1,11 +1,11 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react'
 import './TextInput.css'
 
 interface TextInputParams {
     currentCommand: string
     userInput: string
     isTestRunning: boolean
-    onUserInputChange: (input: string, enteredKey?: string) => void
+    onUserInputChange: (input: string, mistakeCount?: number, enteredKey?: string) => void
     totalIncorrectChars: number
 }
 
@@ -14,8 +14,9 @@ interface TextInputRef extends Partial<HTMLInputElement> {
 }
 
 export const TextInput = forwardRef<TextInputRef, TextInputParams>(
-    ({ currentCommand, userInput, isTestRunning, onUserInputChange }, ref) => {
+    ({ currentCommand, userInput, isTestRunning, onUserInputChange, totalIncorrectChars }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
+        const [mistakes, setMistakes] = useState<boolean[]>([])
 
         useImperativeHandle(ref, () => ({
             focus: () => {
@@ -26,26 +27,15 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             ...inputRef.current,
         }))
 
+        useEffect(() => {
+            setMistakes(new Array(currentCommand.length).fill(false))
+        }, [currentCommand])
+
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
 
             if (currentCommand === '') {
                 switch (key) {
-                    case 'Backspace':
-                        e.preventDefault()
-                        if (userInput.length > 0) {
-                            const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput)
-                        }
-                        break
-                    case 'ArrowLeft':
-                    case 'ArrowRight':
-                        e.preventDefault()
-                        break
-                    case 'Enter':
-                        e.preventDefault()
-                        onUserInputChange(userInput, 'Enter')
-                        break
                     default:
                         e.preventDefault()
                         break
@@ -56,7 +46,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         e.preventDefault()
                         if (userInput.length > 0) {
                             const newUserInput = userInput.slice(0, -1)
-                            onUserInputChange(newUserInput)
+                            onUserInputChange(newUserInput, totalIncorrectChars)
                         }
                         break
                     case 'ArrowLeft':
@@ -65,15 +55,26 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         break
                     case 'Enter':
                         e.preventDefault()
-                        if (userInput.length === currentCommand.length) {
-                            onUserInputChange(userInput, 'Enter')
+                        if (userInput.length === currentCommand.length && userInput === currentCommand) {
+                            onUserInputChange(userInput, undefined, 'Enter')
                         }
                         break
                     default:
                         if (key.length === 1 && userInput.length < currentCommand.length && isTestRunning) {
                             e.preventDefault()
                             const newUserInput = userInput + key
-                            onUserInputChange(newUserInput)
+                            const currentPosition = userInput.length
+                            const incorrectChars =
+                                key !== currentCommand[currentPosition] && !mistakes[currentPosition]
+                                    ? totalIncorrectChars + 1
+                                    : totalIncorrectChars
+                            const newMistakes = [...mistakes]
+
+                            if (key !== currentCommand[currentPosition]) {
+                                newMistakes[currentPosition] = true
+                            }
+                            setMistakes(newMistakes)
+                            onUserInputChange(newUserInput, incorrectChars)
                         }
                         break
                 }
