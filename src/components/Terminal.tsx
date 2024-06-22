@@ -24,6 +24,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
     const [testDuration, setTestDuration] = useState<number>(0)
     const [testAccuracy, setTestAccuracy] = useState<number>(0)
+    const [completedTestName, setCompletedTestName] = useState<string>('')
 
     const [elapsedTime, setElapsedTime] = useState<number>(0)
     const [commandHistory, setCommandHistory] = useState<string[]>([])
@@ -184,6 +185,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
         const accuracy = calculateAccuracy(totalIncorrectChars)
         setTestDuration(Number(duration))
         setTestAccuracy(Number(accuracy))
+        setCompletedTestName(selectedCommandSet.name) // Save the completed test name
         onFinishTest(Number(accuracy), Number(duration))
         setModalIsOpen(true)
     }
@@ -289,7 +291,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                 </div>
             </div>
             <ResultModal
-                testName={selectedCommandSet.name}
+                testName={completedTestName}
                 isOpen={modalIsOpen}
                 onRequestClose={() => setModalIsOpen(false)}
                 time={testDuration}

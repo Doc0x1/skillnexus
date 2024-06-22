@@ -17,6 +17,8 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
     ({ currentCommand, userInput, isTestRunning, onUserInputChange, totalIncorrectChars }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
         const [mistakes, setMistakes] = useState<boolean[]>([])
+        const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; id: number }[]>([])
+        const feedbackIdRef = useRef(0)
 
         useImperativeHandle(ref, () => ({
             focus: () => {
@@ -55,6 +57,11 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         break
                     case 'Enter':
                         e.preventDefault()
+                        const feedbackType = userInput === currentCommand ? 'correct' : 'incorrect'
+                        setFeedback(prev => [...prev, { type: feedbackType, id: feedbackIdRef.current++ }])
+                        setTimeout(() => {
+                            setFeedback(prev => prev.filter(f => f.id !== feedbackIdRef.current - 1))
+                        }, 1000)
                         if (userInput.length === currentCommand.length && userInput === currentCommand) {
                             onUserInputChange(userInput, undefined, 'Enter')
                         }
@@ -130,6 +137,13 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     onChange={() => {}}
                 />
                 {isTestRunning && renderInputElements()}
+                <div className="relative flex items-end justify-end">
+                    {feedback.map(f => (
+                        <div key={f.id} className={`feedback ${f.type}`} style={{ left: `1rem` }}>
+                            {f.type === 'correct' ? '✓' : '✗'}
+                        </div>
+                    ))}
+                </div>
             </div>
         )
     }

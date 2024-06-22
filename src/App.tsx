@@ -9,11 +9,10 @@ import commandsJson from './commands.json'
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [selectedCommandSet, setSelectedCommandSet] = useState<string>('')
-    const [commandSetName, setCommandSetName] = useState<string>('No Test Selected')
     const [entries, setEntries] = useState<Entries>({})
     const [commandSetMapping, setCommandSetMapping] = useState<{ [key: string]: string }>({})
     const [isTestRunning, setIsTestRunning] = useState<boolean>(false)
-    const [results, setResults] = useState<{ accuracy: number; duration: number } | null>(null)
+    const [results, setResults] = useState<{ testName: string; accuracy: number; duration: number }[]>([])
 
     useEffect(() => {
         const bgImage = new Image()
@@ -37,12 +36,6 @@ function App() {
         setCommandSetMapping(mapping)
     }, [])
 
-    useEffect(() => {
-        if (selectedCommandSet !== '') {
-            setCommandSetName(entries[commandSetMapping[selectedCommandSet]].name)
-        }
-    }, [selectedCommandSet, commandSetMapping, entries])
-
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCommandSet(e.target.value)
     }
@@ -56,7 +49,8 @@ function App() {
     }
 
     const handleFinishTest = (accuracy: number, duration: number) => {
-        setResults({ accuracy, duration })
+        const testName = entries[commandSetMapping[selectedCommandSet]].name
+        setResults(prevResults => [...prevResults, { testName, accuracy, duration }])
         setIsTestRunning(false)
     }
 
@@ -95,13 +89,21 @@ function App() {
                 onStopTest={stopTest}
                 onFinishTest={handleFinishTest}
             />
-            {results ? (
+            {results.length > 0 ? (
                 <div className="result-modal mt-4">
                     <div className="text-xl font-bold">Previous Results</div>
                     <hr className="border-green-600" />
-                    <div className="pb-1 pt-1 text-center text-lg font-bold">{commandSetName}</div>
-                    <div className="pl-[10px] text-left text-base font-medium">Accuracy: {results.accuracy}%</div>
-                    <div className="pl-[10px] text-left text-base font-medium">Duration: {results.duration}s</div>
+                    {results.map((result, index) => (
+                        <div key={index} className="result-item mb-2">
+                            <div className="pb-1 pt-1 text-center text-lg font-bold">{result.testName}</div>
+                            <div className="pl-[10px] text-left text-base font-medium">
+                                Accuracy: {result.accuracy}%
+                            </div>
+                            <div className="pl-[10px] text-left text-base font-medium">
+                                Duration: {result.duration}s
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <div className="mt-4 text-center">
@@ -110,6 +112,27 @@ function App() {
                     We will be adding more features as time goes on, but for now, enjoy the Terminal!
                 </div>
             )}
+
+            <div className="bottom-left">
+                <a
+                    href="https://discord.gg/hacknexus"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="corner-button"
+                >
+                    Join us on Discord
+                </a>
+            </div>
+            <div className="bottom-right">
+                <a
+                    href="https://www.patreon.com/hacknexus"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="corner-button"
+                >
+                    Support us on Patreon
+                </a>
+            </div>
         </div>
     )
 }

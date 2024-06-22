@@ -22,69 +22,44 @@ body,
     height: 100%;
     background-size: cover;
     background-position: center;
+    position: relative; /* Add this to position the corner buttons */
 }
 
-/* Container for the select and button */
-.control-panel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.bottom-left,
+.bottom-right {
+    position: absolute;
+    bottom: 20px;
 }
 
-/* Common styles for select and button */
-.control-element {
-    height: 40px; /* Adjust height as needed */
-    font-size: 16px;
-    border-radius: 4px;
-    padding: 0 10px; /* Horizontal padding */
+.bottom-left {
+    left: 20px;
+}
+
+.bottom-right {
+    right: 20px;
+}
+
+.corner-button {
+    background-color: #000000;
+    color: #00ff00;
     border: 2px solid #00ff00;
-    outline: none;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
     transition:
         background-color 0.3s ease,
         color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1; /* Ensure line height doesn't affect centering */
-    margin-bottom: 0.5em;
 }
 
-/* Select dropdown styles */
-#test-select {
-    background-color: #000000;
-    color: #00ff00;
-}
-
-#test-select:disabled {
-    background-color: #444444;
-    color: #777777;
-    cursor: not-allowed;
-}
-
-#test-select:hover {
-    background-color: #222222;
-}
-
-/* Button styles */
-.start-test-button,
-.stop-test-button {
-    background-color: #000000;
-    color: #00ff00;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.start-test-button:hover,
-.stop-test-button:hover {
+.corner-button:hover {
     background-color: #1e1e1e;
     color: #00ff00;
-}
-
-.start-test-button:disabled,
-.stop-test-button:disabled {
-    background-color: #444444;
-    color: #777777;
-    cursor: not-allowed;
 }
 
 /* Result modal styles */

@@ -141,7 +141,7 @@
         ]
     },
     "Pentesting Commands": {
-        "name": "Practice Pentesting Commands",
+        "name": "Pentesting Commands",
         "value": "linux-terminal-pentesting",
         "type": "Pentesting-Commands",
         "commands": [
@@ -187,8 +187,8 @@
             }
         ]
     },
-    "Box1 Walkthrough": {
-        "name": "Practice Box Commands",
+    "Box 1 Walkthrough": {
+        "name": "Box 1 Walkthrough",
         "value": "linux-terminal-box1",
         "type": "Box-Walkthroughs",
         "commands": [
