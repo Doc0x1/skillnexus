@@ -5,6 +5,7 @@ import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator'
 import XFCEMenuBar from './components/XFCEMenuBar/XFCEMenuBar'
 import { Entries } from './types/commandSet'
 import commandsJson from './commands.json'
+import SelectTestModal from './components/SelectTestModal/SelectTestModal'
 
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -13,6 +14,7 @@ function App() {
     const [commandSetMapping, setCommandSetMapping] = useState<{ [key: string]: string }>({})
     const [isTestRunning, setIsTestRunning] = useState<boolean>(false)
     const [results, setResults] = useState<{ testName: string; accuracy: number; duration: number }[]>([])
+    const [selectTestModalIsOpen, setSelectTestModalIsOpen] = useState<boolean>(false)
 
     useEffect(() => {
         const bgImage = new Image()
@@ -42,6 +44,7 @@ function App() {
 
     const startTest = () => {
         setIsTestRunning(true)
+        setSelectTestModalIsOpen(false) // Close the modal when the test starts
     }
 
     const stopTest = () => {
@@ -72,44 +75,40 @@ function App() {
     return (
         <div className="App" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/background.jpg)` }}>
             <div className="w-full text-center">
-                <XFCEMenuBar
-                    selectedCommandSet={selectedCommandSet}
-                    handleSelectChange={handleSelectChange}
-                    isTestRunning={isTestRunning}
-                    startTest={startTest}
-                    stopTest={stopTest}
-                    groupedEntries={groupedEntries}
-                />
+                <XFCEMenuBar />
             </div>
 
             <Terminal
                 selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
                 isTestRunning={isTestRunning}
-                onStartTest={startTest}
                 onStopTest={stopTest}
                 onFinishTest={handleFinishTest}
+                openSelectTestModal={() => setSelectTestModalIsOpen(true)}
             />
-            {results.length > 0 ? (
+
+            <SelectTestModal
+                isOpen={selectTestModalIsOpen}
+                groupedEntries={groupedEntries}
+                isTestRunning={isTestRunning}
+                selectedCommandSet={selectedCommandSet}
+                onRequestClose={() => setSelectTestModalIsOpen(false)}
+                startTest={startTest}
+                handleSelectChange={handleSelectChange}
+            />
+
+            {results.length > 0 && (
                 <div className="result-modal mt-4">
-                    <div className="text-xl font-bold">Previous Results</div>
+                    <div className="text-xl font-bold">Previous Result</div>
                     <hr className="border-green-600" />
-                    {results.map((result, index) => (
-                        <div key={index} className="result-item mb-2">
-                            <div className="pb-1 pt-1 text-center text-lg font-bold">{result.testName}</div>
-                            <div className="pl-[10px] text-left text-base font-medium">
-                                Accuracy: {result.accuracy}%
-                            </div>
-                            <div className="pl-[10px] text-left text-base font-medium">
-                                Duration: {result.duration}s
-                            </div>
+                    <div className="result-item mb-2">
+                        <div className="pb-1 pt-1 text-center text-lg font-bold">{results[0].testName}</div>
+                        <div className="pl-[10px] text-left text-base font-medium">
+                            Accuracy: {results[0].accuracy}%
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="mt-4 text-center">
-                    Welcome to Skill Nexus!
-                    <br />
-                    We will be adding more features as time goes on, but for now, enjoy the Terminal!
+                        <div className="pl-[10px] text-left text-base font-medium">
+                            Duration: {results[0].duration}s
+                        </div>
+                    </div>
                 </div>
             )}
 

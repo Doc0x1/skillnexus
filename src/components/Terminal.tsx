@@ -1,20 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './Terminal.css'
-import { faCircleChevronUp, faMinusCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { CommandSet } from '../types/commandSet'
 import { TextInput } from './TextInput/TextInput'
 import ResultModal from './ResultModal/ResultModal'
+import TerminalTopBar from './TerminalTopBar'
 
 interface TerminalProps {
     selectedCommandSet: CommandSet
     isTestRunning: boolean
-    onStartTest: () => void
     onStopTest: () => void
     onFinishTest: (accuracy: number, duration: number) => void
+    openSelectTestModal: () => void
 }
 
-export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTest }: TerminalProps) {
+export default function Terminal({
+    selectedCommandSet,
+    isTestRunning,
+    onStopTest,
+    onFinishTest,
+    openSelectTestModal,
+}: TerminalProps) {
     const [input, setInput] = useState<string>('')
     const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
     const [currentCommand, setCurrentCommand] = useState<string>('')
@@ -35,6 +40,8 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
     const [isDragging, setIsDragging] = useState(false)
     const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 })
     const [offset, setOffset] = useState({ x: 0, y: 0 })
+
+    const isDebugOn = process.env.REACT_APP_DEBUG ?? false
 
     useEffect(() => {
         let timer: NodeJS.Timeout
@@ -115,7 +122,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
         }
     }
 
-    const checkCommandInput = (updatedInput: string, incorrectChars: number) => {
+    const checkCommandInput = (updatedInput: string) => {
         const commands = selectedCommandSet?.commands || []
         if (currentCommandIndex < commands.length) {
             const expectedCommand = commands[currentCommandIndex].command
@@ -126,7 +133,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                     setCurrentCommand(commands[currentCommandIndex + 1].command)
                     setCurrentDescription(commands[currentCommandIndex + 1].description)
                     setCommandHistory(prev => [...prev, input])
-                    if (commandHistory.length > 3) {
+                    if (commandHistory.length > 2) {
                         commandHistory.shift()
                     }
                 } else {
@@ -166,7 +173,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
         setInput(newInput)
         setTotalIncorrectChars(prev => prev + mistakes)
         if (enteredKey === 'Enter' && isTestRunning) {
-            checkCommandInput(newInput, 0)
+            checkCommandInput(newInput)
             setInput('')
         } else {
             setTotalIncorrectChars(mistakes)
@@ -208,53 +215,45 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                 }}
             >
                 <div className="top-bar" id="drag-handle" onMouseDown={handleMouseDown}>
-                    <div className="title-bar">
-                        <ul className="menu-bar flex justify-start">
-                            <li>File</li>
-                            <li>Edit</li>
-                            <li>View</li>
-                            <li>Search</li>
-                            <li>Terminal</li>
-                            <li>Help</li>
-                        </ul>
-                        <p className="flex justify-center text-lg font-bold">Terminal</p>
-                        <ul className="top-btn flex justify-end gap-1">
-                            <FontAwesomeIcon icon={faMinusCircle} />
-                            <FontAwesomeIcon icon={faCircleChevronUp} />
-                            <FontAwesomeIcon icon={faTimesCircle} />
-                        </ul>
-                    </div>
+                    <TerminalTopBar />
                 </div>
                 <div className="flex flex-col place-content-between" onClick={handleTerminalClick}>
-                    <div>
-                        <br />
-                        <div className="mx-2 grid columns-3 grid-cols-3">
+                    <div className="select-none">
+                        <div className="mx-2 my-2 grid select-none columns-3 grid-cols-3 items-center">
                             <div className="text-start text-lg font-bold text-sky-400">
                                 <span>
                                     Command Progress:&nbsp;
                                     {(isTestRunning && selectedCommandSet.commands.length - currentCommandIndex) || 0}
                                 </span>
                             </div>
-                            <div className="whitespace-pre text-center text-lg font-bold text-red-500">
-                                {selectedCommandSet.name ? (
-                                    <span>{selectedCommandSet.name}</span>
+                            <div className="justify-self-center whitespace-pre text-center text-lg font-bold text-red-500">
+                                {isTestRunning ? (
+                                    <button className="stop-test-button control-element" onClick={onStopTest}>
+                                        Stop Test
+                                    </button>
                                 ) : (
-                                    <span>Select a test from the System's Menu Bar</span>
+                                    <button className="start-test-button control-element" onClick={openSelectTestModal}>
+                                        Start Test
+                                    </button>
                                 )}
                             </div>
                             <div className="terminal-timer text-end text-lg font-bold text-sky-400">
                                 <span>Timer: {elapsedTime.toFixed(2)}</span>
                             </div>
                         </div>
-                        <br />
                         <hr />
                         <div className="terminal-line">
                             <div
-                                className={`col-start-2 text-lg font-extrabold text-green-400 opacity-100 ${isTestRunning ? 'text-left' : ''}`}
+                                className={`col-start-2 select-none text-lg font-extrabold text-green-400 opacity-100 ${isTestRunning ? 'text-left' : ''}`}
                             >
-                                {isTestRunning
-                                    ? currentDescription
-                                    : 'Information about each command you are typing will be displayed here as you progress.'}
+                                {isTestRunning ? (
+                                    currentDescription
+                                ) : (
+                                    <div>
+                                        Information about each command you are typing will be displayed here as you
+                                        progress.
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -263,7 +262,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                         {
                             // ? Below handles the command history being displayed
                         }
-                        <div className="terminal-history flex flex-col gap-2">
+                        <div className="terminal-history flex select-none flex-col gap-2">
                             {commandHistory.map((cmd, index) => (
                                 <div key={index} className="terminal-command flex items-baseline text-left">
                                     <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
@@ -274,7 +273,7 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                         {
                             // ? Below handles displaying user input as they type the commands
                         }
-                        <div className="terminal-command flex items-baseline text-left">
+                        <div className="terminal-command flex select-none items-baseline text-left">
                             <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
                             <div className="terminal-prompt-input flex place-items-baseline">
                                 <TextInput
@@ -297,6 +296,14 @@ export default function Terminal({ selectedCommandSet, isTestRunning, onFinishTe
                 time={testDuration}
                 accuracy={testAccuracy}
             />
+
+            {isDebugOn && (
+                <div>
+                    <h1>DEBUG</h1>
+                    <div>Total incorrect chars: {totalIncorrectChars}</div>
+                    <div>Current Test Accuracy: {testAccuracy}</div>
+                </div>
+            )}
         </>
     )
 }

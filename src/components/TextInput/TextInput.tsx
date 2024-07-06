@@ -121,14 +121,14 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         }
 
         return (
-            <div className="text-input-display relative whitespace-pre font-mono">
+            <div className="text-input-display relative cursor-default whitespace-pre font-mono">
                 <input
                     id="input-area"
                     ref={inputRef}
                     spellCheck="false"
                     minLength={0}
                     type="text"
-                    className={`flex border-none text-transparent
+                    className={`flex cursor-default border-none text-transparent
                         outline-none ${isTestRunning ? 'absolute w-full' : 'w-4'}`}
                     onKeyDown={handleKeyDown}
                     onMouseDown={handleMouseDown}

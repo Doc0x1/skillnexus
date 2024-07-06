@@ -22,7 +22,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ testName, isOpen, onRequestCl
             overlayClassName="overlay"
             contentLabel="Test Complete"
         >
-            <div className="inline-flex flex-col items-center">
+            <div className="inline-flex select-none flex-col items-center">
                 <h1 className="flex-nowrap text-3xl font-semibold">{testName} Complete!</h1>
                 <br />
                 <div className="font-mono text-lg font-medium">Completion Time: {time.toFixed(2)} seconds</div>

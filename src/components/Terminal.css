@@ -3,7 +3,8 @@
     --terminal-height: 500px; /* Updated height to match the height in .terminal */
     --terminal-bradius: 5px;
     --prompt: #ff1919;
-    --top-bar: #d7d7d7;
+    --top-bar: #2e3440; /* XFCE menu bar color */
+    --top-bar-text: #d8dee9; /* XFCE menu bar text color */
     --shell: rgba(15, 15, 15, 0.8);
     --path: #5d8dbc;
 }
@@ -40,8 +41,77 @@ ul li {
     text-align: left;
     font-size: 15px;
     background-color: var(--top-bar);
-    padding: 1px;
-    cursor: move; /* Indicate it's draggable */
+    color: var(--top-bar-text);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.terminal .top-bar .top-btn-left {
+    display: flex;
+}
+
+.terminal .top-bar .menu-icon {
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--top-bar-text);
+    transition: background-color 0.3s ease;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 3px;
+}
+
+.terminal .top-bar .menu-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Light grey background on hover */
+}
+
+.terminal .top-bar .top-btn-right {
+    display: flex;
+}
+
+.terminal .top-bar .top-btn-right .circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.terminal .top-bar .top-btn-right .circle svg {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.terminal .top-bar .top-btn-right .circle.yellow {
+    background-color: #f1fa8c;
+}
+
+.terminal .top-bar .top-btn-right .circle.green {
+    background-color: #50fa7b;
+}
+
+.terminal .top-bar .top-btn-right .circle.red {
+    background-color: #ff5555;
+}
+
+.terminal .top-bar .top-btn-right .circle.yellow:hover {
+    background-color: #ffcc00;
+}
+
+.terminal .top-bar .top-btn-right .circle.green:hover {
+    background-color: #00cc00;
+}
+
+.terminal .top-bar .top-btn-right .circle.red:hover {
+    background-color: #cc0000;
+}
+
+.terminal .top-bar .top-btn-right .circle:hover svg {
+    opacity: 1;
+    color: #000000; /* Solid color for the icon on hover */
 }
 
 .terminal .top-bar .title-bar {
@@ -51,19 +121,25 @@ ul li {
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 0.5rem;
-    color: black;
 }
 
 .terminal .top-bar .menu-bar {
     padding: 0 2px;
     margin: 3px;
-    color: black;
+}
+
+.terminal .top-bar .menu-bar li {
+    color: var(--top-bar-text);
+    cursor: pointer;
+}
+
+.terminal .top-bar .menu-bar li:hover {
+    background-color: #4c566a; /* Hover background color */
 }
 
 .terminal .top-bar .title-bar .title {
     text-align: center;
     padding-left: 45px;
-    color: black;
     font-family: 'Courier New', Courier, monospace;
 }
 
