@@ -104,12 +104,8 @@ function App() {
                         <hr className="border-green-600" />
                         <div className="result-item mb-2">
                             <div className="pb-1 pt-1 text-center text-lg font-bold">{results[0].testName}</div>
-                            <div className="pl-[10px] text-left text-base font-medium">
-                                Accuracy: {results[0].accuracy}%
-                            </div>
-                            <div className="pl-[10px] text-left text-base font-medium">
-                                Duration: {results[0].duration}s
-                            </div>
+                            <div className="pl-[10px] text-base font-medium">Accuracy: {results[0].accuracy}%</div>
+                            <div className="pl-[10px] text-base font-medium">Duration: {results[0].duration}s</div>
                         </div>
                     </div>
                 )}

@@ -217,11 +217,12 @@ export default function Terminal({
                 }}
             >
                 <div className="top-bar" id="drag-handle" onMouseDown={handleMouseDown}>
-                    <TerminalTopBar />
+                    <TerminalTopBar selectedCommandSet={selectedCommandSet} />
                 </div>
                 <div className="flex flex-col place-content-between" onClick={handleTerminalClick}>
                     <div className="select-none">
-                        <div className="mx-2 my-2 grid select-none columns-3 grid-cols-3 items-center">
+                        {/* Shows the Command Progress, Test Selection elements, and the Timer */}
+                        <div className="mx-2 my-2 grid select-none grid-cols-1 items-center sm:grid-cols-3">
                             <div className="text-start text-lg font-bold text-sky-400">
                                 <span>
                                     Command Progress:&nbsp;
@@ -234,7 +235,7 @@ export default function Terminal({
                                         Stop Test
                                     </button>
                                 ) : (
-                                    <div className="flex flex-row gap-5">
+                                    <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
                                         <button
                                             className="start-test-button control-element"
                                             onClick={openSelectTestModal}
@@ -251,10 +252,11 @@ export default function Terminal({
                                     </div>
                                 )}
                             </div>
-                            <div className="terminal-timer text-end text-lg font-bold text-sky-400">
+                            <div className="text-end text-lg font-bold text-sky-400">
                                 <span>Timer: {elapsedTime.toFixed(2)}</span>
                             </div>
                         </div>
+
                         <hr />
                         <div className="terminal-line">
                             <div

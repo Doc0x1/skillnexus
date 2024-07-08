@@ -101,18 +101,20 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                 return []
             }
             for (let i = 0; i < currentCommand.length; i++) {
-                let charClassCssVar = 'char'
-                if (currentCommand[i] === ' ') charClassCssVar = 'space'
-                else charClassCssVar = 'char'
+                const isSpace = currentCommand[i] === ' '
                 const charClass = userInput[i]
                     ? userInput[i] === currentCommand[i]
-                        ? `correct-${charClassCssVar}`
-                        : `incorrect-${charClassCssVar}`
+                        ? isSpace
+                            ? 'correct-space'
+                            : 'correct-char'
+                        : isSpace
+                          ? 'incorrect-space'
+                          : 'incorrect-char'
                     : 'bg-char'
 
                 renderedText.push(
                     <span key={i} className={`whitespace-pre ${charClass}`}>
-                        {currentCommand[i]}
+                        {isSpace && userInput[i] ? '\u00A0' : currentCommand[i]}
                     </span>
                 )
             }

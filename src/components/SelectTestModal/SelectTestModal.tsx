@@ -31,10 +31,10 @@ const SelectTestModal: React.FC<SelectTestModalProps> = ({
             contentLabel="Select Test"
         >
             <div className="inline-flex flex-col items-center">
-                <h1 className="text-3xl font-semibold">Select a Test</h1>
+                <h1 className="select-none text-3xl font-semibold">Select a Test</h1>
                 <br />
                 <div className="test-selector flex gap-2">
-                    <div className="flex flex-col items-center justify-center">
+                    <div className="flex select-none flex-col items-center justify-center">
                         <select
                             id="test-select"
                             value={selectedCommandSet}
@@ -42,11 +42,11 @@ const SelectTestModal: React.FC<SelectTestModalProps> = ({
                             className="control-element"
                             disabled={isTestRunning}
                         >
-                            <option value="" unselectable="on">
+                            <option className="text-left" value="" unselectable="on">
                                 Select a Test
                             </option>
                             {Object.keys(groupedEntries).map(type => (
-                                <optgroup key={type} label={type.replace(/-/g, ' ')}>
+                                <optgroup className="text-left" key={type} label={type.replace(/-/g, ' ')}>
                                     {groupedEntries[type].map(([commands, { value }]) => (
                                         <option key={value} value={value}>
                                             {commands}

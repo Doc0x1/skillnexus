@@ -1,4 +1,15 @@
 {
+    "Testing": {
+        "name": "Test Commands",
+        "value": "test-commands-1",
+        "type": "Test-Commands",
+        "commands": [
+            {
+                "command": "ls -l /root",
+                "description": "This is a test command."
+            }
+        ]
+    },
     "Linux Commands - Beginner": {
         "name": "Beginner Linux Commands",
         "value": "linux-terminal-beginner",
