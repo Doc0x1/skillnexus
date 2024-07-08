@@ -234,3 +234,10 @@ ul li {
     flex-direction: column;
     gap: 0.5rem;
 }
+
+.debug-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    place-items: center;
+}

@@ -9,6 +9,7 @@ interface TerminalProps {
     selectedCommandSet: CommandSet
     isTestRunning: boolean
     onStopTest: () => void
+    onStartTest: () => void
     onFinishTest: (accuracy: number, duration: number) => void
     openSelectTestModal: () => void
 }
@@ -17,6 +18,7 @@ export default function Terminal({
     selectedCommandSet,
     isTestRunning,
     onStopTest,
+    onStartTest,
     onFinishTest,
     openSelectTestModal,
 }: TerminalProps) {
@@ -232,9 +234,21 @@ export default function Terminal({
                                         Stop Test
                                     </button>
                                 ) : (
-                                    <button className="start-test-button control-element" onClick={openSelectTestModal}>
-                                        Start Test
-                                    </button>
+                                    <div className="flex flex-row gap-5">
+                                        <button
+                                            className="start-test-button control-element"
+                                            onClick={openSelectTestModal}
+                                        >
+                                            Select Test
+                                        </button>
+                                        <button
+                                            className="start-test-button control-element"
+                                            onClick={onStartTest}
+                                            disabled={!selectedCommandSet.name}
+                                        >
+                                            Start Test
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                             <div className="terminal-timer text-end text-lg font-bold text-sky-400">
@@ -298,8 +312,9 @@ export default function Terminal({
             />
 
             {isDebugOn && (
-                <div>
+                <div className="debug-info">
                     <h1>DEBUG</h1>
+                    <div>{selectedCommandSet.name}</div>
                     <div>Total incorrect chars: {totalIncorrectChars}</div>
                     <div>Current Test Accuracy: {testAccuracy}</div>
                 </div>

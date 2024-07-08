@@ -8,7 +8,6 @@ interface SelectTestModalProps {
     groupedEntries: { [key: string]: [string, { name: string; value: string; type: string }][] }
     isTestRunning: boolean
     onRequestClose: () => void
-    startTest: () => void
     handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
@@ -20,7 +19,6 @@ const SelectTestModal: React.FC<SelectTestModalProps> = ({
     groupedEntries,
     isTestRunning,
     onRequestClose,
-    startTest,
     handleSelectChange,
 }) => {
     return (
@@ -60,24 +58,14 @@ const SelectTestModal: React.FC<SelectTestModalProps> = ({
                         <div>
                             <button
                                 className="start-test-button control-element"
-                                onClick={() => {
-                                    startTest()
-                                    onRequestClose()
-                                }}
+                                onClick={onRequestClose}
                                 disabled={!selectedCommandSet}
                             >
-                                Start Test
+                                Select Test
                             </button>
                         </div>
                     </div>
                 </div>
-                <br />
-                <button
-                    className="cursor-pointer rounded-lg border-2 border-blue-600 px-3 py-2 font-mono text-blue-400 hover:bg-blue-600 hover:text-blue-200"
-                    onClick={onRequestClose}
-                >
-                    Close
-                </button>
             </div>
         </Modal>
     )

@@ -57,6 +57,10 @@ function App() {
         setIsTestRunning(false)
     }
 
+    const goBack = () => {
+        window.history.back()
+    }
+
     if (isLoading) {
         return <LoadingIndicator />
     }
@@ -74,63 +78,70 @@ function App() {
 
     return (
         <div className="App" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/background.jpg)` }}>
-            <div className="w-full text-center">
-                <XFCEMenuBar />
-            </div>
-
-            <Terminal
-                selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
-                isTestRunning={isTestRunning}
-                onStopTest={stopTest}
-                onFinishTest={handleFinishTest}
-                openSelectTestModal={() => setSelectTestModalIsOpen(true)}
-            />
-
-            <SelectTestModal
-                isOpen={selectTestModalIsOpen}
-                groupedEntries={groupedEntries}
-                isTestRunning={isTestRunning}
-                selectedCommandSet={selectedCommandSet}
-                onRequestClose={() => setSelectTestModalIsOpen(false)}
-                startTest={startTest}
-                handleSelectChange={handleSelectChange}
-            />
-
-            {results.length > 0 && (
-                <div className="result-modal mt-4">
-                    <div className="text-xl font-bold">Previous Result</div>
-                    <hr className="border-green-600" />
-                    <div className="result-item mb-2">
-                        <div className="pb-1 pt-1 text-center text-lg font-bold">{results[0].testName}</div>
-                        <div className="pl-[10px] text-left text-base font-medium">
-                            Accuracy: {results[0].accuracy}%
-                        </div>
-                        <div className="pl-[10px] text-left text-base font-medium">
-                            Duration: {results[0].duration}s
+            <div className="desktop-only">
+                <div className="w-full text-center">
+                    <XFCEMenuBar />
+                </div>
+                <Terminal
+                    selectedCommandSet={entries[commandSetMapping[selectedCommandSet]] || {}}
+                    isTestRunning={isTestRunning}
+                    onStopTest={stopTest}
+                    onStartTest={startTest}
+                    onFinishTest={handleFinishTest}
+                    openSelectTestModal={() => setSelectTestModalIsOpen(true)}
+                />
+                <SelectTestModal
+                    isOpen={selectTestModalIsOpen}
+                    groupedEntries={groupedEntries}
+                    isTestRunning={isTestRunning}
+                    selectedCommandSet={selectedCommandSet}
+                    onRequestClose={() => setSelectTestModalIsOpen(false)}
+                    handleSelectChange={handleSelectChange}
+                />
+                {results.length > 0 && (
+                    <div className="result-modal mt-4">
+                        <div className="text-xl font-bold">Previous Result</div>
+                        <hr className="border-green-600" />
+                        <div className="result-item mb-2">
+                            <div className="pb-1 pt-1 text-center text-lg font-bold">{results[0].testName}</div>
+                            <div className="pl-[10px] text-left text-base font-medium">
+                                Accuracy: {results[0].accuracy}%
+                            </div>
+                            <div className="pl-[10px] text-left text-base font-medium">
+                                Duration: {results[0].duration}s
+                            </div>
                         </div>
                     </div>
+                )}
+                <div className="bottom-left">
+                    <a
+                        href="https://discord.gg/hacknexus"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="corner-button"
+                    >
+                        Join us on Discord
+                    </a>
                 </div>
-            )}
-
-            <div className="bottom-left">
-                <a
-                    href="https://discord.gg/hacknexus"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="corner-button"
-                >
-                    Join us on Discord
-                </a>
+                <div className="bottom-right">
+                    <a
+                        href="https://www.patreon.com/hacknexus"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="corner-button"
+                    >
+                        Support us on Patreon
+                    </a>
+                </div>
             </div>
-            <div className="bottom-right">
-                <a
-                    href="https://www.patreon.com/hacknexus"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="corner-button"
-                >
-                    Support us on Patreon
-                </a>
+            <div className="mobile-warning">
+                <div>
+                    This site is meant to be viewed on a computer browser, not on mobile. <br /> <br /> If you'd like to
+                    use this site, we recommend you do so on a computer rather than a mobile device.
+                </div>
+                <button className="back-button font-bold" onClick={goBack}>
+                    Go back
+                </button>
             </div>
         </div>
     )
