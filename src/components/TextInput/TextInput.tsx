@@ -36,10 +36,27 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
 
+            // Regular terminal mode (when currentCommand is empty)
             if (currentCommand === '') {
                 switch (key) {
-                    default:
+                    case 'Enter':
                         e.preventDefault()
+                        onUserInputChange(userInput, undefined, 'Enter')
+                        break
+                    case 'Backspace':
+                        e.preventDefault()
+                        if (userInput.length > 0) {
+                            const newUserInput = userInput.slice(0, -1)
+                            onUserInputChange(newUserInput, totalIncorrectChars)
+                        }
+                        break
+                    default:
+                        if (key.length === 1) {
+                            e.preventDefault()
+                            const newUserInput = userInput + key
+                            onUserInputChange(newUserInput, totalIncorrectChars)
+                        }
+                        // Allow other keys (arrows, etc.) to work normally
                         break
                 }
             } else {
@@ -113,7 +130,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     : 'bg-char'
 
                 renderedText.push(
-                    <span key={i} className={`whitespace-pre ${charClass}`}>
+                    <span key={i} className={charClass}>
                         {isSpace && userInput[i] ? '\u00A0' : currentCommand[i]}
                     </span>
                 )
@@ -123,22 +140,38 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         }
 
         return (
-            <div className="text-input-display relative cursor-default whitespace-pre font-mono">
+            <div className="text-input-display relative cursor-default font-mono w-full">
                 <input
                     id="input-area"
                     ref={inputRef}
                     spellCheck="false"
                     minLength={0}
                     type="text"
-                    className={`flex cursor-default border-none text-transparent
-                        outline-none ${isTestRunning ? 'absolute w-full' : 'w-4'}`}
+                    className="absolute top-0 left-0 w-0 h-0 opacity-0 pointer-events-none border-0 outline-0"
                     onKeyDown={handleKeyDown}
                     onMouseDown={handleMouseDown}
                     autoFocus
                     value={userInput}
                     onChange={() => {}}
                 />
-                {isTestRunning && renderInputElements()}
+                <div 
+                    className="text-white bg-transparent cursor-text word-break-all overflow-wrap-anywhere whitespace-pre-wrap min-h-[1.2em] w-full"
+                    onClick={handleMouseDown}
+                    style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}
+                >
+                    {isTestRunning ? (
+                        <div className="word-break-all overflow-wrap-anywhere whitespace-pre-wrap">
+                            {renderInputElements()}
+                        </div>
+                    ) : (
+                        <>
+                            <span style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
+                                {userInput}
+                            </span>
+                            <span className="terminal-cursor">|</span>
+                        </>
+                    )}
+                </div>
                 <div className="relative flex items-end justify-end">
                     {feedback.map(f => (
                         <div key={f.id} className={`feedback ${f.type}`} style={{ left: `1rem` }}>

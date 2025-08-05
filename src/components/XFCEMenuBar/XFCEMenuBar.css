@@ -1,18 +1,1 @@
 /* XFCEMenuBar.css */
-
-.xfce-menubar {
-    width: 100%;
-    background-color: #1e1e1e;
-    padding: 0px 10px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Courier New', Courier, monospace;
-}
-
-.menu-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}

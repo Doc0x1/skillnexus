@@ -1,0 +1,330 @@
+{
+  "/": {
+    "type": "directory",
+    "children": {
+      "bin": {
+        "type": "directory",
+        "children": {
+          "bash": { "type": "file", "content": "bash shell executable" },
+          "ls": { "type": "file", "content": "list directory contents" },
+          "cd": { "type": "file", "content": "change directory" },
+          "pwd": { "type": "file", "content": "print working directory" },
+          "cat": { "type": "file", "content": "concatenate files" },
+          "mkdir": { "type": "file", "content": "make directories" },
+          "rmdir": { "type": "file", "content": "remove directories" },
+          "rm": { "type": "file", "content": "remove files" },
+          "cp": { "type": "file", "content": "copy files" },
+          "mv": { "type": "file", "content": "move/rename files" },
+          "grep": { "type": "file", "content": "search text patterns" },
+          "find": { "type": "file", "content": "find files and directories" },
+          "chmod": { "type": "file", "content": "change file permissions" },
+          "chown": { "type": "file", "content": "change file ownership" },
+          "ps": { "type": "file", "content": "show running processes" },
+          "kill": { "type": "file", "content": "terminate processes" },
+          "top": { "type": "file", "content": "display running processes" },
+          "tar": { "type": "file", "content": "archive files" },
+          "gzip": { "type": "file", "content": "compress files" },
+          "wget": { "type": "file", "content": "download files" },
+          "curl": { "type": "file", "content": "transfer data" },
+          "ssh": { "type": "file", "content": "secure shell" },
+          "scp": { "type": "file", "content": "secure copy" },
+          "sudo": { "type": "file", "content": "execute as another user" },
+          "su": { "type": "file", "content": "switch user" },
+          "nano": { "type": "file", "content": "text editor" },
+          "vim": { "type": "file", "content": "vi improved editor" },
+          "emacs": { "type": "file", "content": "emacs editor" }
+        }
+      },
+      "sbin": {
+        "type": "directory",
+        "children": {
+          "init": { "type": "file", "content": "system initialization" },
+          "mount": { "type": "file", "content": "mount filesystems" },
+          "umount": { "type": "file", "content": "unmount filesystems" },
+          "fsck": { "type": "file", "content": "filesystem check" },
+          "fdisk": { "type": "file", "content": "disk partitioning tool" },
+          "iptables": { "type": "file", "content": "firewall administration" },
+          "service": { "type": "file", "content": "control system services" },
+          "systemctl": { "type": "file", "content": "systemd control" },
+          "ifconfig": { "type": "file", "content": "network interface configuration" },
+          "route": { "type": "file", "content": "network routing table" }
+        }
+      },
+      "usr": {
+        "type": "directory",
+        "children": {
+          "bin": {
+            "type": "directory",
+            "children": {
+              "python": { "type": "file", "content": "Python interpreter" },
+              "python3": { "type": "file", "content": "Python 3 interpreter" },
+              "node": { "type": "file", "content": "Node.js runtime" },
+              "npm": { "type": "file", "content": "Node package manager" },
+              "git": { "type": "file", "content": "version control system" },
+              "gcc": { "type": "file", "content": "GNU C compiler" },
+              "make": { "type": "file", "content": "build automation tool" },
+              "docker": { "type": "file", "content": "container platform" },
+              "kubectl": { "type": "file", "content": "Kubernetes control" },
+              "java": { "type": "file", "content": "Java runtime" },
+              "javac": { "type": "file", "content": "Java compiler" },
+              "mysql": { "type": "file", "content": "MySQL client" },
+              "postgres": { "type": "file", "content": "PostgreSQL client" },
+              "redis-cli": { "type": "file", "content": "Redis client" },
+              "htop": { "type": "file", "content": "interactive process viewer" },
+              "tree": { "type": "file", "content": "display directory tree" },
+              "jq": { "type": "file", "content": "command-line JSON processor" },
+              "awk": { "type": "file", "content": "pattern scanning language" },
+              "sed": { "type": "file", "content": "stream editor" }
+            }
+          },
+          "sbin": {
+            "type": "directory",
+            "children": {
+              "nginx": { "type": "file", "content": "web server" },
+              "apache2": { "type": "file", "content": "Apache web server" },
+              "mysqld": { "type": "file", "content": "MySQL server daemon" },
+              "sshd": { "type": "file", "content": "SSH server daemon" }
+            }
+          },
+          "lib": {
+            "type": "directory",
+            "children": {
+              "systemd": {
+                "type": "directory",
+                "children": {
+                  "system": { "type": "directory", "children": {} }
+                }
+              }
+            }
+          },
+          "share": {
+            "type": "directory",
+            "children": {
+              "doc": { "type": "directory", "children": {} },
+              "man": {
+                "type": "directory",
+                "children": {
+                  "man1": { "type": "directory", "children": {} },
+                  "man2": { "type": "directory", "children": {} },
+                  "man3": { "type": "directory", "children": {} }
+                }
+              },
+              "applications": { "type": "directory", "children": {} },
+              "fonts": { "type": "directory", "children": {} }
+            }
+          },
+          "local": {
+            "type": "directory",
+            "children": {
+              "bin": { "type": "directory", "children": {} },
+              "lib": { "type": "directory", "children": {} },
+              "share": { "type": "directory", "children": {} },
+              "src": { "type": "directory", "children": {} }
+            }
+          }
+        }
+      },
+      "lib": {
+        "type": "directory",
+        "children": {
+          "modules": { "type": "directory", "children": {} },
+          "firmware": { "type": "directory", "children": {} }
+        }
+      },
+      "lib64": {
+        "type": "directory",
+        "children": {}
+      },
+      "etc": {
+        "type": "directory",
+        "children": {
+          "passwd": { "type": "file", "content": "root:x:0:0:root:/root:/bin/bash\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin" },
+          "group": { "type": "file", "content": "root:x:0:\nadm:x:4:\nsudo:x:27:" },
+          "shadow": { "type": "file", "content": "root:*:19000:0:99999:7:::" },
+          "hosts": { "type": "file", "content": "127.0.0.1\tlocalhost\n127.0.1.1\thacknexus\n::1\tlocalhost ip6-localhost ip6-loopback" },
+          "hostname": { "type": "file", "content": "hacknexus" },
+          "resolv.conf": { "type": "file", "content": "nameserver 8.8.8.8\nnameserver 8.8.4.4" },
+          "fstab": { "type": "file", "content": "# /etc/fstab: static file system information" },
+          "crontab": { "type": "file", "content": "# /etc/crontab: system-wide crontab" },
+          "profile": { "type": "file", "content": "# /etc/profile: system-wide .profile file for the Bourne shell" },
+          "bashrc": { "type": "file", "content": "# System-wide .bashrc file for interactive bash(1) shells" },
+          "ssh": {
+            "type": "directory",
+            "children": {
+              "sshd_config": { "type": "file", "content": "# SSH daemon configuration" },
+              "ssh_config": { "type": "file", "content": "# SSH client configuration" }
+            }
+          },
+          "nginx": {
+            "type": "directory",
+            "children": {
+              "nginx.conf": { "type": "file", "content": "# Nginx configuration" },
+              "sites-available": { "type": "directory", "children": {} },
+              "sites-enabled": { "type": "directory", "children": {} }
+            }
+          },
+          "apache2": {
+            "type": "directory",
+            "children": {
+              "apache2.conf": { "type": "file", "content": "# Apache configuration" },
+              "sites-available": { "type": "directory", "children": {} },
+              "sites-enabled": { "type": "directory", "children": {} }
+            }
+          },
+          "systemd": {
+            "type": "directory",
+            "children": {
+              "system": { "type": "directory", "children": {} }
+            }
+          }
+        }
+      },
+      "var": {
+        "type": "directory",
+        "children": {
+          "log": {
+            "type": "directory",
+            "children": {
+              "syslog": { "type": "file", "content": "System log messages" },
+              "auth.log": { "type": "file", "content": "Authentication log" },
+              "kern.log": { "type": "file", "content": "Kernel log messages" },
+              "dpkg.log": { "type": "file", "content": "Package management log" },
+              "apache2": { "type": "directory", "children": {} },
+              "nginx": { "type": "directory", "children": {} }
+            }
+          },
+          "www": {
+            "type": "directory",
+            "children": {
+              "html": {
+                "type": "directory",
+                "children": {
+                  "index.html": { "type": "file", "content": "<!DOCTYPE html>\n<html>\n<head><title>Welcome</title></head>\n<body><h1>Welcome to nginx!</h1></body>\n</html>" }
+                }
+              }
+            }
+          },
+          "cache": { "type": "directory", "children": {} },
+          "lib": {
+            "type": "directory",
+            "children": {
+              "mysql": { "type": "directory", "children": {} },
+              "postgresql": { "type": "directory", "children": {} }
+            }
+          },
+          "spool": {
+            "type": "directory",
+            "children": {
+              "cron": { "type": "directory", "children": {} },
+              "mail": { "type": "directory", "children": {} }
+            }
+          },
+          "tmp": { "type": "directory", "children": {} }
+        }
+      },
+      "tmp": {
+        "type": "directory", 
+        "children": {}
+      },
+      "opt": {
+        "type": "directory",
+        "children": {}
+      },
+      "mnt": {
+        "type": "directory",
+        "children": {}
+      },
+      "media": {
+        "type": "directory",
+        "children": {}
+      },
+      "home": {
+        "type": "directory",
+        "children": {}
+      },
+      "root": {
+        "type": "directory",
+        "children": {
+          ".bashrc": { "type": "file", "content": "# ~/.bashrc: executed by bash(1) for non-login shells\n\n# If not running interactively, don't do anything\ncase $- in\n    *i*) ;;\n      *) return;;\nesac\n\n# History settings\nHISTCONTROL=ignoreboth\nHISTSIZE=1000\nHISTFILESIZE=2000\n\n# Enable color support\nif [ -x /usr/bin/dircolors ]; then\n    test -r ~/.dircolors && eval \"$(dircolors -b ~/.dircolors)\" || eval \"$(dircolors -b)\"\n    alias ls='ls --color=auto'\n    alias grep='grep --color=auto'\nfi\n\n# Some useful aliases\nalias ll='ls -alF'\nalias la='ls -A'\nalias l='ls -CF'\n\n# Enable programmable completion features\nif ! shopt -oq posix; then\n  if [ -f /usr/share/bash-completion/bash_completion ]; then\n    . /usr/share/bash-completion/bash_completion\n  elif [ -f /etc/bash_completion ]; then\n    . /etc/bash_completion\n  fi\nfi" },
+          ".bash_profile": { "type": "file", "content": "# ~/.bash_profile: executed by the command interpreter for login shells\n\nif [ -f ~/.bashrc ]; then\n    . ~/.bashrc\nfi\n\n# User specific environment and startup programs\nPATH=$PATH:$HOME/bin\nexport PATH" },
+          ".profile": { "type": "file", "content": "# ~/.profile: executed by the command interpreter for login shells\n\n# Set PATH so it includes user's private bin if it exists\nif [ -d \"$HOME/bin\" ] ; then\n    PATH=\"$HOME/bin:$PATH\"\nfi\n\n# Set PATH so it includes user's private bin if it exists\nif [ -d \"$HOME/.local/bin\" ] ; then\n    PATH=\"$HOME/.local/bin:$PATH\"\nfi" },
+          ".vimrc": { "type": "file", "content": "\" ~/.vimrc: Vim configuration file\n\nset number\nset tabstop=4\nset shiftwidth=4\nset expandtab\nset autoindent\nset smartindent\nset hlsearch\nset incsearch\nset ignorecase\nset smartcase\nset showcmd\nset showmatch\nset ruler\nset laststatus=2\nsyntax on\nfiletype plugin indent on\n\n\" Enable mouse support\nset mouse=a\n\n\" Color scheme\ncolorscheme desert" },
+          ".gitconfig": { "type": "file", "content": "[user]\n\tname = root\n\temail = root@hacknexus.local\n[core]\n\teditor = vim\n[init]\n\tdefaultBranch = main\n[pull]\n\trebase = false\n[color]\n\tui = auto" },
+          ".ssh": {
+            "type": "directory",
+            "children": {
+              "config": { "type": "file", "content": "# SSH client configuration\nHost *\n    ServerAliveInterval 60\n    ServerAliveCountMax 3\n    StrictHostKeyChecking ask\n    UserKnownHostsFile ~/.ssh/known_hosts" },
+              "known_hosts": { "type": "file", "content": "# SSH known hosts" }
+            }
+          },
+          ".local": {
+            "type": "directory",
+            "children": {
+              "bin": { "type": "directory", "children": {} },
+              "lib": { "type": "directory", "children": {} },
+              "share": { "type": "directory", "children": {} }
+            }
+          },
+          ".config": {
+            "type": "directory",
+            "children": {
+              "git": { "type": "directory", "children": {} }
+            }
+          },
+          ".cache": {
+            "type": "directory",
+            "children": {}
+          },
+          "Desktop": { "type": "directory", "children": {} },
+          "Documents": { "type": "directory", "children": {} },
+          "Downloads": { "type": "directory", "children": {} },
+          "Pictures": { "type": "directory", "children": {} },
+          "Videos": { "type": "directory", "children": {} },
+          "Music": { "type": "directory", "children": {} },
+          "projects": {
+            "type": "directory",
+            "children": {
+              "hacknexus": {
+                "type": "directory",
+                "children": {
+                  "README.md": { "type": "file", "content": "# HackNexus Terminal Practice\n\nA web-based terminal typing practice application." }
+                }
+              }
+            }
+          }
+        }
+      },
+      "boot": {
+        "type": "directory",
+        "children": {
+          "grub": { "type": "directory", "children": {} }
+        }
+      },
+      "dev": {
+        "type": "directory",
+        "children": {
+          "null": { "type": "file", "content": "" },
+          "zero": { "type": "file", "content": "" },
+          "random": { "type": "file", "content": "" },
+          "urandom": { "type": "file", "content": "" }
+        }
+      },
+      "proc": {
+        "type": "directory",
+        "children": {
+          "cpuinfo": { "type": "file", "content": "processor\t: 0\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 142\nmodel name\t: Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz" },
+          "meminfo": { "type": "file", "content": "MemTotal:        8048576 kB\nMemFree:         3024512 kB\nMemAvailable:    5012345 kB" },
+          "version": { "type": "file", "content": "Linux version 5.15.0 (root@hacknexus) (gcc version 11.2.0) #1 SMP" }
+        }
+      },
+      "sys": {
+        "type": "directory",
+        "children": {}
+      },
+      "run": {
+        "type": "directory",
+        "children": {}
+      }
+    }
+  }
+}

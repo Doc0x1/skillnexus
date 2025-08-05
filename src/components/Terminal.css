@@ -21,28 +21,44 @@ ul li {
 
 .terminal {
     position: relative;
-    width: min-content;
-    height: min-content;
-    min-width: var(--terminal-width);
-    min-height: var(--terminal-height);
-    display: grid;
-    grid-auto-rows: 0.1fr 1fr;
-    overflow-y: auto;
-    background-color: rgba(19, 19, 19, 0.753); /* Background color of the terminal */
+    display: flex;
+    flex-direction: column;
+    min-width: 400px;
+    min-height: 300px;
+    background-color: rgba(14, 14, 14, 0.753); /* Background color of the terminal */
     color: #ffffff; /* Text color */
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
     border-radius: var(--terminal-bradius);
-    margin: 0 auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+}
+
+.terminal-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.terminal-description {
+    border-bottom: 1px solid #333;
+}
+
+.terminal.dimmed {
+    opacity: 0.3;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
 .terminal .top-bar {
     font-family: Cantarell, sans-serif;
     text-align: left;
-    font-size: 15px;
+    font-size: 12px;
     background-color: var(--top-bar);
     color: var(--top-bar-text);
-    padding: 10px;
+    padding: 4px;
     display: flex;
     justify-content: space-between;
 }
@@ -73,9 +89,6 @@ ul li {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
     position: relative;
     transition: background-color 0.3s ease;
 }
@@ -175,18 +188,15 @@ ul li {
     display: flex;
     align-items: center;
     font-size: medium;
-    flex: auto;
+    flex-shrink: 0;
 }
 
 .terminal-prompt-input {
-    flex: 1;
-    display: flex;
     color: white;
     font-size: medium;
 }
 
 .terminal-prompt-input > input {
-    flex: 1;
     width: 100%;
     background-color: transparent;
     caret-shape: bar;
@@ -194,14 +204,18 @@ ul li {
     color: white;
     outline: none;
     font-size: medium;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: anywhere;
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
 }
 
 .terminal-prompt-input span {
     font-family: 'IBM Plex Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; /* Monospace font */
     font-size: medium;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 .terminal-link {
@@ -299,6 +313,76 @@ ul li {
     background-color: #444444;
     color: #777777;
     cursor: not-allowed;
+}
+
+/* Resize handles */
+.resize-handle {
+    position: absolute;
+    background-color: transparent;
+}
+
+.resize-handle-n,
+.resize-handle-s {
+    height: 4px;
+    left: 4px;
+    right: 4px;
+    cursor: ns-resize;
+}
+
+.resize-handle-w,
+.resize-handle-e {
+    width: 4px;
+    top: 4px;
+    bottom: 4px;
+    cursor: ew-resize;
+}
+
+.resize-handle-n {
+    top: -2px;
+}
+
+.resize-handle-s {
+    bottom: -2px;
+}
+
+.resize-handle-w {
+    left: -2px;
+}
+
+.resize-handle-e {
+    right: -2px;
+}
+
+.resize-handle-nw,
+.resize-handle-ne,
+.resize-handle-sw,
+.resize-handle-se {
+    width: 8px;
+    height: 8px;
+}
+
+.resize-handle-nw {
+    top: -2px;
+    left: -2px;
+    cursor: nw-resize;
+}
+
+.resize-handle-ne {
+    top: -2px;
+    right: -2px;
+    cursor: ne-resize;
+}
+
+.resize-handle-sw {
+    bottom: -2px;
+    left: -2px;
+    cursor: sw-resize;
+}
+
+.resize-handle-se {
+    bottom: -2px;
+    right: -2px;
+    cursor: se-resize;
 }
 
 @media (min-width: 640px) {

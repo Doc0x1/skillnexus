@@ -1,23 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import './Terminal.css'
+import { CommandSet } from '../types/commandSet'
 import { TextInput } from './TextInput/TextInput'
+import ResultModal from './ResultModal/ResultModal'
 import TerminalTopBar from './TerminalTopBar'
-import { CommandEmulator } from '../utils/commandEmulator'
+import { TerminalInstance } from './Terminal'
 
-export interface TerminalInstance {
-    id: string
-    isMinimized: boolean
-    isMaximized: boolean
-    position: { x: number; y: number }
-    size: { width: number; height: number }
-    originalPosition?: { x: number; y: number }
-    originalSize?: { width: number; height: number }
-    zIndex: number
-}
-
-interface TerminalProps {
+interface TestsTerminalProps {
     instance: TerminalInstance
+    selectedCommandSet?: CommandSet
+    isTestRunning: boolean
+    onStopTest: () => void
+    onStartTest: () => void
+    onFinishTest: (accuracy: number, duration: number) => void
+    openSelectTestModal: () => void
+    onCommandProgress?: (remaining: number) => void
     onInstanceUpdate: (instance: TerminalInstance) => void
     onMinimize: (terminalId: string) => void
     onMaximize: (terminalId: string) => void
@@ -26,41 +24,72 @@ interface TerminalProps {
     isModalOpen?: boolean
 }
 
-export default function Terminal({
+export default function TestsTerminal({
     instance,
+    selectedCommandSet,
+    isTestRunning,
+    onStopTest,
+    onStartTest,
+    onFinishTest,
+    openSelectTestModal,
+    onCommandProgress,
     onInstanceUpdate,
     onMinimize,
     onMaximize,
     onClose,
     onFocus,
     isModalOpen = false,
-}: TerminalProps) {
+}: TestsTerminalProps) {
     const [input, setInput] = useState<string>('')
-    const [terminalHistory, setTerminalHistory] = useState<Array<{ type: 'input' | 'output' | 'error'; content: string; prompt?: string }>>([])
-    const [commandEmulator] = useState(() => new CommandEmulator())
+    const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
+    const [currentCommand, setCurrentCommand] = useState<string>('')
+    const [currentDescription, setCurrentDescription] = useState<string>('')
+    const [startTime, setStartTime] = useState<number | null>(null)
+    const [totalIncorrectChars, setTotalIncorrectChars] = useState<number>(0)
+    const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
+    const [testDuration, setTestDuration] = useState<number>(0)
+    const [testAccuracy, setTestAccuracy] = useState<number>(0)
+    const [completedTestName, setCompletedTestName] = useState<string>('')
+    const [elapsedTime, setElapsedTime] = useState<number>(0)
+    const [commandHistory, setCommandHistory] = useState<string[]>([])
 
     const textInputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
-    const terminalContentRef = useRef<HTMLDivElement>(null)
 
     const [isDragging, setIsDragging] = useState(false)
     const [offset, setOffset] = useState({ x: 0, y: 0 })
     const [isResizing, setIsResizing] = useState(false)
     const [resizeHandle, setResizeHandle] = useState('')
 
-    // Focus input when terminal is clicked
-    useEffect(() => {
-        if (textInputRef.current) {
-            textInputRef.current.focus()
-        }
-    }, [])
+    const isDebugOn = process.env.REACT_APP_DEBUG ?? false
 
-    // Scroll to bottom when terminalHistory updates
     useEffect(() => {
-        if (terminalContentRef.current) {
-            terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight
+        let timer: NodeJS.Timeout
+
+        if (isTestRunning) {
+            setStartTime(Date.now())
+            setInput('')
+            setTotalIncorrectChars(0)
+            setCurrentCommandIndex(0)
+            setCommandHistory([])
+            if (selectedCommandSet && selectedCommandSet.commands.length > 0) {
+                setCurrentCommand(selectedCommandSet.commands[0].command)
+                setCurrentDescription(selectedCommandSet.commands[0].description)
+            }
+            if (textInputRef.current) {
+                textInputRef.current.focus()
+            }
+            timer = setInterval(() => {
+                setElapsedTime((Date.now() - (startTime || 0)) / 1000)
+            }, 10)
+        } else {
+            cleanupInputLine()
         }
-    }, [terminalHistory])
+
+        return () => {
+            if (timer) clearInterval(timer)
+        }
+    }, [isTestRunning, selectedCommandSet, testDuration, testAccuracy, startTime])
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -68,7 +97,6 @@ export default function Terminal({
                 const newX = e.clientX + offset.x
                 const newY = e.clientY + offset.y
 
-                // Constrain the terminal within usable bounds (between top bar and dock)
                 const terminalElement = terminalRef.current
                 if (terminalElement) {
                     const terminalWidth = terminalElement.offsetWidth
@@ -78,7 +106,7 @@ export default function Terminal({
                     
                     // Define boundaries: top bar is ~40px, dock is ~60px from bottom
                     const topBoundary = 40
-                    const bottomBoundary = screenHeight - 40
+                    const bottomBoundary = screenHeight - 60
                     const leftBoundary = 0
                     const rightBoundary = screenWidth
                     
@@ -100,7 +128,7 @@ export default function Terminal({
                     
                     // Define boundaries: top bar is ~40px, dock is ~60px from bottom
                     const topBoundary = 40
-                    const bottomBoundary = screenHeight - 40
+                    const bottomBoundary = screenHeight - 60
                     const leftBoundary = 0
                     const rightBoundary = screenWidth
                     
@@ -159,6 +187,43 @@ export default function Terminal({
         }
     }, [isDragging, isResizing, offset, resizeHandle, instance, onInstanceUpdate])
 
+    const checkCommandInput = (updatedInput: string) => {
+        const commands = selectedCommandSet?.commands || []
+        if (currentCommandIndex < commands.length) {
+            const expectedCommand = commands[currentCommandIndex].command
+            if (updatedInput === expectedCommand) {
+                const newIndex = currentCommandIndex + 1
+                setCurrentCommandIndex(newIndex)
+                
+                const remaining = commands.length - newIndex
+                onCommandProgress?.(remaining)
+                
+                if (newIndex < commands.length && isTestRunning) {
+                    setCurrentCommand(commands[newIndex].command)
+                    setCurrentDescription(commands[newIndex].description)
+                    setCommandHistory(prev => [...prev, input])
+                    if (commandHistory.length > 2) {
+                        commandHistory.shift()
+                    }
+                } else {
+                    setCurrentCommand('')
+                    setCurrentDescription('')
+                    handleFinishTest(totalIncorrectChars)
+                }
+            }
+        }
+    }
+
+    const cleanupInputLine = () => {
+        setCommandHistory([])
+        setStartTime(0)
+        setElapsedTime(0)
+        setCurrentCommandIndex(0)
+        setCurrentCommand('')
+        setCurrentDescription('')
+        setInput('')
+    }
+
     const handleMouseUp = () => {
         setIsDragging(false)
         setIsResizing(false)
@@ -180,57 +245,17 @@ export default function Terminal({
         setResizeHandle(handle)
     }
 
-    const handleUserInputChange = (newInput: string, _mistakes = 0, enteredKey = '') => {
+    const handleUserInputChange = (newInput: string, mistakes = 0, enteredKey = '') => {
         setInput(newInput)
-        
-        // Scroll to bottom if not already there when typing
-        if (terminalContentRef.current && enteredKey !== 'Enter') {
-            const { scrollTop, scrollHeight, clientHeight } = terminalContentRef.current
-            if (scrollTop + clientHeight < scrollHeight - 5) { // Small threshold to avoid jitter
-                terminalContentRef.current.scrollTop = scrollHeight
-            }
-        }
+        setTotalIncorrectChars(prev => prev + mistakes)
         
         if (enteredKey === 'Enter') {
-            executeCommand(newInput)
-            setInput('')
-        }
-    }
-
-    const executeCommand = (command: string) => {
-        const currentPath = commandEmulator.getCurrentPath()
-        const prompt = `root@hacknexus:${currentPath}$`
-        
-        // Add the input to history
-        setTerminalHistory(prev => [...prev, {
-            type: 'input',
-            content: command,
-            prompt: prompt
-        }])
-
-        // Check if the command is clear
-        if (command.trim() === 'clear') {
-            setTerminalHistory([])
-            return
-        }
-
-        // Execute the command
-        const result = commandEmulator.executeCommand(command)
-        
-        // Add output to history
-        if (result.output) {
-            setTerminalHistory(prev => [...prev, {
-                type: 'output',
-                content: result.output
-            }])
-        }
-        
-        // Add error to history if present
-        if (result.error) {
-            setTerminalHistory(prev => [...prev, {
-                type: 'error',
-                content: result.error || 'Unknown error'
-            }])
+            if (isTestRunning) {
+                checkCommandInput(newInput)
+                setInput('')
+            }
+        } else {
+            setTotalIncorrectChars(mistakes)
         }
     }
 
@@ -240,12 +265,26 @@ export default function Terminal({
         }
     }
 
+    const handleFinishTest = (totalIncorrectChars: number) => {
+        const endTime = Date.now()
+        const duration = ((endTime - (startTime || 0)) / 1000).toFixed(2)
+        const accuracy = calculateAccuracy(totalIncorrectChars)
+        setTestDuration(Number(duration))
+        setTestAccuracy(Number(accuracy))
+        setCompletedTestName(selectedCommandSet?.name || 'Test')
+        onFinishTest(Number(accuracy), Number(duration))
+        setModalIsOpen(true)
+    }
+
+    const calculateAccuracy = (totalIncorrectChars: number) => {
+        const totalCharsTyped = input.length + totalIncorrectChars
+        const correctChars = input.split('').filter((char, index) => char === currentCommand[index]).length
+        return ((correctChars / totalCharsTyped) * 100).toFixed(2)
+    }
+
     if (instance.isMinimized) {
         return null
     }
-
-    const currentPath = commandEmulator.getCurrentPath()
-    const prompt = `root@hacknexus:${currentPath}$`
 
     const getInitialState = () => {
         if (instance.isMinimized) {
@@ -269,7 +308,7 @@ export default function Terminal({
             return { 
                 scale: 1,
                 x: 0,
-                y: 0
+                y: 40
             }
         }
         return { 
@@ -320,53 +359,47 @@ export default function Terminal({
                     >
                     <div className="top-bar" id="drag-handle" onMouseDown={handleMouseDown}>
                         <TerminalTopBar
-                            selectedCommandSet={undefined}
+                            selectedCommandSet={selectedCommandSet}
                             onMinimize={() => onMinimize(instance.id)}
                             onMaximize={() => onMaximize(instance.id)}
                             onClose={() => onClose(instance.id)}
                         />
                     </div>
-                    <div 
-                        className="terminal-content" 
-                        ref={terminalContentRef}
-                        onClick={handleTerminalClick}
-                        style={{ overflowY: 'auto' }}
-                    >
-                        <div className="flex flex-col items-stretch gap-2 pb-2 pl-4 pr-4 text-left w-full">
-                            {/* Regular terminal history */}
-                            <div className="terminal-history flex select-none flex-col gap-2 w-full">
-                                {terminalHistory.map((entry, index) => (
-                                    <div key={index} className="w-full">
-                                        {entry.type === 'input' && (
-                                            <div className="terminal-command flex items-baseline text-left w-full">
-                                                <p className="terminal-user text-red-500 flex-shrink-0">{entry.prompt}&nbsp;</p>
-                                                <div className="flex-1 min-w-0 break-words overflow-wrap-anywhere">{entry.content}</div>
-                                            </div>
-                                        )}
-                                        {entry.type === 'output' && (
-                                            <div className="terminal-output text-white whitespace-pre-wrap break-words overflow-wrap-anywhere w-full">
-                                                {entry.content}
-                                            </div>
-                                        )}
-                                        {entry.type === 'error' && (
-                                            <div className="terminal-error text-red-400 break-words overflow-wrap-anywhere w-full">
-                                                {entry.content}
-                                            </div>
-                                        )}
+                    <div className="terminal-content" onClick={handleTerminalClick}>
+                        <div className="terminal-description">
+                            <div
+                                className={`select-none text-lg font-extrabold text-green-400 opacity-100 p-4 ${isTestRunning ? 'text-left' : 'text-center'}`}
+                            >
+                                {isTestRunning ? (
+                                    currentDescription
+                                ) : (
+                                    <div>
+                                        Select a test from the desktop icons and start typing commands!
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-baseline gap-2 pb-2 pl-4 text-left">
+                            {/* Test mode command history */}
+                            <div className="terminal-history flex select-none flex-col gap-2">
+                                {commandHistory.map((cmd, index) => (
+                                    <div key={index} className="terminal-command flex items-baseline text-left">
+                                        <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
+                                        <div className="flex place-items-baseline">{cmd}</div>
                                     </div>
                                 ))}
                             </div>
                             {/* Current input line */}
-                            <div className="terminal-command flex select-none items-start text-left w-full">
-                                <p className="terminal-user text-red-500 flex-shrink-0">{prompt}&nbsp;</p>
-                                <div className="flex-1 min-w-0">
+                            <div className="terminal-command flex select-none items-baseline text-left">
+                                <p className="terminal-user text-red-500">root@linux:~$&nbsp;</p>
+                                <div className="terminal-prompt-input flex place-items-baseline">
                                     <TextInput
                                         ref={textInputRef}
-                                        currentCommand=""
-                                        isTestRunning={false}
+                                        currentCommand={currentCommand}
+                                        isTestRunning={isTestRunning}
                                         userInput={input}
                                         onUserInputChange={handleUserInputChange}
-                                        totalIncorrectChars={0}
+                                        totalIncorrectChars={totalIncorrectChars}
                                     />
                                 </div>
                             </div>
@@ -385,6 +418,23 @@ export default function Terminal({
                     </motion.div>
                 )}
             </AnimatePresence>
+            <>
+                <ResultModal
+                    testName={completedTestName}
+                    isOpen={modalIsOpen}
+                    onRequestClose={() => setModalIsOpen(false)}
+                    time={testDuration}
+                    accuracy={testAccuracy}
+                />
+                {isDebugOn && (
+                    <div className="debug-info">
+                        <h1>DEBUG</h1>
+                        <div>{selectedCommandSet?.name || 'No test selected'}</div>
+                        <div>Total incorrect chars: {totalIncorrectChars}</div>
+                        <div>Current Test Accuracy: {testAccuracy}</div>
+                    </div>
+                )}
+            </>
         </>
     )
 }

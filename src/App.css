@@ -23,6 +23,7 @@ body,
     background-size: cover;
     background-position: center;
     position: relative; /* Add this to position the corner buttons */
+    padding-bottom: 40px; /* Space for bottom taskbar */
 }
 
 .bottom-left,
@@ -122,6 +123,8 @@ body,
     .desktop-only {
         display: block;
         width: 100%;
+        height: calc(100vh - 40px); /* Account for taskbar height */
+        position: relative;
     }
 
     .mobile-warning {

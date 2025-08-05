@@ -1,0 +1,19 @@
+/* src/styles/fonts.css */
+
+:root {
+  --font-rubik: 'Rubik', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-merriweather: 'Merriweather', serif;
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+  --font-open-sans: 'Open Sans', sans-serif;
+  --font-source-code-pro: 'Source Code Pro', monospace;
+}
+
+@import '@fontsource/rubik';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/merriweather/400.css';
+@import '@fontsource/merriweather/700.css';
+@import '@fontsource/jetbrains-mono';
+@import '@fontsource/open-sans';
+@import '@fontsource/source-code-pro';
