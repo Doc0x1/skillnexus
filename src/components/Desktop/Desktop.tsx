@@ -102,10 +102,6 @@ const Desktop: React.FC<DesktopProps> = ({
             <DesktopIcons
                 onSpawnTerminal={handleSpawnTerminal}
                 onOpenSelectTestModal={onOpenSelectTestModal}
-                onStartTest={onStartTest}
-                onStopTest={onStopTest}
-                isTestRunning={isTestRunning}
-                selectedCommandSet={selectedCommandSet}
                 testModeTerminalId={testModeTerminalId}
             />
             

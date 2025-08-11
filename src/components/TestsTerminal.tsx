@@ -31,7 +31,6 @@ export default function TestsTerminal({
     onStopTest,
     onStartTest,
     onFinishTest,
-    openSelectTestModal,
     onCommandProgress,
     onInstanceUpdate,
     onMinimize,
@@ -46,11 +45,11 @@ export default function TestsTerminal({
     const [currentDescription, setCurrentDescription] = useState<string>('')
     const [startTime, setStartTime] = useState<number | null>(null)
     const [totalIncorrectChars, setTotalIncorrectChars] = useState<number>(0)
+    const [totalCommandsAttempted, setTotalCommandsAttempted] = useState<number>(0)
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
     const [testDuration, setTestDuration] = useState<number>(0)
     const [testAccuracy, setTestAccuracy] = useState<number>(0)
     const [completedTestName, setCompletedTestName] = useState<string>('')
-    const [elapsedTime, setElapsedTime] = useState<number>(0)
     const [commandHistory, setCommandHistory] = useState<string[]>([])
 
     const textInputRef = useRef<HTMLInputElement>(null)
@@ -70,6 +69,7 @@ export default function TestsTerminal({
             setStartTime(Date.now())
             setInput('')
             setTotalIncorrectChars(0)
+            setTotalCommandsAttempted(0)
             setCurrentCommandIndex(0)
             setCommandHistory([])
             if (selectedCommandSet && selectedCommandSet.commands.length > 0) {
@@ -80,7 +80,7 @@ export default function TestsTerminal({
                 textInputRef.current.focus()
             }
             timer = setInterval(() => {
-                setElapsedTime((Date.now() - (startTime || 0)) / 1000)
+                // Timer for potential future use
             }, 10)
         } else {
             cleanupInputLine()
@@ -89,7 +89,7 @@ export default function TestsTerminal({
         return () => {
             if (timer) clearInterval(timer)
         }
-    }, [isTestRunning, selectedCommandSet, testDuration, testAccuracy, startTime])
+    }, [isTestRunning, selectedCommandSet, startTime])
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -191,6 +191,8 @@ export default function TestsTerminal({
         const commands = selectedCommandSet?.commands || []
         if (currentCommandIndex < commands.length) {
             const expectedCommand = commands[currentCommandIndex].command
+            setTotalCommandsAttempted(prev => prev + 1)
+            
             if (updatedInput === expectedCommand) {
                 const newIndex = currentCommandIndex + 1
                 setCurrentCommandIndex(newIndex)
@@ -208,20 +210,39 @@ export default function TestsTerminal({
                 } else {
                     setCurrentCommand('')
                     setCurrentDescription('')
-                    handleFinishTest(totalIncorrectChars)
+                    handleFinishTest()
                 }
+            } else {
+                // Count incorrect characters only when Enter is pressed with wrong command
+                const incorrectChars = calculateIncorrectCharsInCommand(updatedInput, expectedCommand)
+                setTotalIncorrectChars(prev => prev + incorrectChars)
             }
         }
+    }
+
+    const calculateIncorrectCharsInCommand = (userCommand: string, expectedCommand: string) => {
+        let incorrectCount = 0
+        for (let i = 0; i < userCommand.length; i++) {
+            if (userCommand[i] !== expectedCommand[i]) {
+                incorrectCount++
+            }
+        }
+        // Also count missing characters if user command is shorter
+        if (userCommand.length < expectedCommand.length) {
+            incorrectCount += expectedCommand.length - userCommand.length
+        }
+        return incorrectCount
     }
 
     const cleanupInputLine = () => {
         setCommandHistory([])
         setStartTime(0)
-        setElapsedTime(0)
         setCurrentCommandIndex(0)
         setCurrentCommand('')
         setCurrentDescription('')
         setInput('')
+        setTotalIncorrectChars(0)
+        setTotalCommandsAttempted(0)
     }
 
     const handleMouseUp = () => {
@@ -245,18 +266,24 @@ export default function TestsTerminal({
         setResizeHandle(handle)
     }
 
-    const handleUserInputChange = (newInput: string, mistakes = 0, enteredKey = '') => {
+    const handleUserInputChange = (newInput: string, _mistakes = 0, enteredKey = '') => {
         setInput(newInput)
-        setTotalIncorrectChars(prev => prev + mistakes)
         
         if (enteredKey === 'Enter') {
             if (isTestRunning) {
                 checkCommandInput(newInput)
                 setInput('')
+            } else if (selectedCommandSet && !isTestRunning) {
+                // Start test when Enter is pressed and test is selected but not running
+                onStartTest()
             }
-        } else {
-            setTotalIncorrectChars(mistakes)
+        } else if (enteredKey === 'Escape') {
+            if (isTestRunning) {
+                // Stop test when ESC is pressed during test
+                onStopTest()
+            }
         }
+        // No longer track mistakes during typing - only on Enter key press
     }
 
     const handleTerminalClick = () => {
@@ -265,10 +292,10 @@ export default function TestsTerminal({
         }
     }
 
-    const handleFinishTest = (totalIncorrectChars: number) => {
+    const handleFinishTest = () => {
         const endTime = Date.now()
         const duration = ((endTime - (startTime || 0)) / 1000).toFixed(2)
-        const accuracy = calculateAccuracy(totalIncorrectChars)
+        const accuracy = calculateAccuracy()
         setTestDuration(Number(duration))
         setTestAccuracy(Number(accuracy))
         setCompletedTestName(selectedCommandSet?.name || 'Test')
@@ -276,10 +303,17 @@ export default function TestsTerminal({
         setModalIsOpen(true)
     }
 
-    const calculateAccuracy = (totalIncorrectChars: number) => {
-        const totalCharsTyped = input.length + totalIncorrectChars
-        const correctChars = input.split('').filter((char, index) => char === currentCommand[index]).length
-        return ((correctChars / totalCharsTyped) * 100).toFixed(2)
+    const calculateAccuracy = () => {
+        if (!selectedCommandSet || totalCommandsAttempted === 0) return 100
+        
+        // Calculate total expected characters across all commands in the test
+        const totalExpectedChars = selectedCommandSet.commands.reduce((sum, cmd) => sum + cmd.command.length, 0)
+        
+        // Calculate accuracy based on incorrect characters vs total expected characters
+        const correctChars = totalExpectedChars - totalIncorrectChars
+        const accuracy = Math.max(0, (correctChars / totalExpectedChars) * 100)
+        
+        return accuracy.toFixed(2)
     }
 
     if (instance.isMinimized) {
@@ -374,7 +408,10 @@ export default function TestsTerminal({
                                     currentDescription
                                 ) : (
                                     <div>
-                                        Select a test from the desktop icons and start typing commands!
+                                        {selectedCommandSet ? 
+                                            "Press Enter to start the test!" :
+                                            "Select a test from the desktop icons to begin!"
+                                        }
                                     </div>
                                 )}
                             </div>
@@ -396,10 +433,12 @@ export default function TestsTerminal({
                                     <TextInput
                                         ref={textInputRef}
                                         currentCommand={currentCommand}
+                                        isTestTerminal={true}
                                         isTestRunning={isTestRunning}
                                         userInput={input}
                                         onUserInputChange={handleUserInputChange}
                                         totalIncorrectChars={totalIncorrectChars}
+                                        uniqueId={instance.id}
                                     />
                                 </div>
                             </div>

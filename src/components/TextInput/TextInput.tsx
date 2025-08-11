@@ -4,9 +4,11 @@ import './TextInput.css'
 interface TextInputParams {
     currentCommand: string
     userInput: string
+    isTestTerminal: boolean
     isTestRunning: boolean
     onUserInputChange: (input: string, mistakeCount?: number, enteredKey?: string) => void
     totalIncorrectChars: number
+    uniqueId?: string
 }
 
 interface TextInputRef extends Partial<HTMLInputElement> {
@@ -14,10 +16,12 @@ interface TextInputRef extends Partial<HTMLInputElement> {
 }
 
 export const TextInput = forwardRef<TextInputRef, TextInputParams>(
-    ({ currentCommand, userInput, isTestRunning, onUserInputChange, totalIncorrectChars }, ref) => {
+    ({ currentCommand, userInput, isTestTerminal, isTestRunning, onUserInputChange, totalIncorrectChars, uniqueId = '' }, ref) => {
         const inputRef = useRef<HTMLInputElement>(null)
+        const textDisplayRef = useRef<HTMLDivElement>(null)
         const [mistakes, setMistakes] = useState<boolean[]>([])
         const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; id: number }[]>([])
+        const [caretPosition, setCaretPosition] = useState({ left: 0, top: 0 })
         const feedbackIdRef = useRef(0)
 
         useImperativeHandle(ref, () => ({
@@ -33,6 +37,57 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
             setMistakes(new Array(currentCommand.length).fill(false))
         }, [currentCommand])
 
+        // Update caret position when user input changes
+        useEffect(() => {
+            if (isTestTerminal && textDisplayRef.current) {
+                const updateCaretPosition = () => {
+                    if (isTestRunning) {
+                        const spans = textDisplayRef.current?.querySelectorAll('span[data-char-index]')
+                        if (spans && spans.length > 0) {
+                            let targetSpan: Element
+                            if (userInput.length === 0) {
+                                // Position at the beginning of the first character
+                                targetSpan = spans[0]
+                                const rect = targetSpan.getBoundingClientRect()
+                                const containerRect = textDisplayRef.current!.getBoundingClientRect()
+                                setCaretPosition({
+                                    left: rect.left - containerRect.left,
+                                    top: rect.top - containerRect.top
+                                })
+                            } else if (userInput.length < spans.length) {
+                                // Position at the beginning of the next character to be typed
+                                targetSpan = spans[userInput.length]
+                                const rect = targetSpan.getBoundingClientRect()
+                                const containerRect = textDisplayRef.current!.getBoundingClientRect()
+                                setCaretPosition({
+                                    left: rect.left - containerRect.left,
+                                    top: rect.top - containerRect.top
+                                })
+                            } else {
+                                // Position at the end of the last character
+                                targetSpan = spans[spans.length - 1]
+                                const rect = targetSpan.getBoundingClientRect()
+                                const containerRect = textDisplayRef.current!.getBoundingClientRect()
+                                setCaretPosition({
+                                    left: rect.right - containerRect.left,
+                                    top: rect.top - containerRect.top
+                                })
+                            }
+                        }
+                    } else {
+                        // Position caret at the beginning when test is not running
+                        setCaretPosition({
+                            left: 0,
+                            top: 2 // Slight vertical adjustment to align with text baseline
+                        })
+                    }
+                }
+
+                // Use setTimeout to ensure DOM is updated
+                setTimeout(updateCaretPosition, 0)
+            }
+        }, [userInput, isTestRunning, currentCommand, isTestTerminal])
+
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             const { key } = e
 
@@ -42,6 +97,12 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     case 'Enter':
                         e.preventDefault()
                         onUserInputChange(userInput, undefined, 'Enter')
+                        break
+                    case 'Escape':
+                        e.preventDefault()
+                        if (isTestTerminal) {
+                            onUserInputChange(userInput, undefined, 'Escape')
+                        }
                         break
                     case 'Backspace':
                         e.preventDefault()
@@ -81,6 +142,12 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                         }, 1000)
                         if (userInput.length === currentCommand.length && userInput === currentCommand) {
                             onUserInputChange(userInput, undefined, 'Enter')
+                        }
+                        break
+                    case 'Escape':
+                        e.preventDefault()
+                        if (isTestTerminal) {
+                            onUserInputChange(userInput, undefined, 'Escape')
                         }
                         break
                     default:
@@ -130,7 +197,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     : 'bg-char'
 
                 renderedText.push(
-                    <span key={i} className={charClass}>
+                    <span key={i} className={charClass} data-char-index={i}>
                         {isSpace && userInput[i] ? '\u00A0' : currentCommand[i]}
                     </span>
                 )
@@ -142,7 +209,7 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
         return (
             <div className="text-input-display relative cursor-default font-mono w-full">
                 <input
-                    id="input-area"
+                    id={uniqueId ? `input-area-${uniqueId}` : 'input-area'}
                     ref={inputRef}
                     spellCheck="false"
                     minLength={0}
@@ -155,15 +222,42 @@ export const TextInput = forwardRef<TextInputRef, TextInputParams>(
                     onChange={() => {}}
                 />
                 <div 
+                    ref={textDisplayRef}
                     className="text-white bg-transparent cursor-text word-break-all overflow-wrap-anywhere whitespace-pre-wrap min-h-[1.2em] w-full"
                     onClick={handleMouseDown}
                     style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}
                 >
-                    {isTestRunning ? (
-                        <div className="word-break-all overflow-wrap-anywhere whitespace-pre-wrap">
-                            {renderInputElements()}
-                        </div>
-                    ) : (
+                    {isTestTerminal ? (
+                        isTestRunning ? (
+                            <>
+                                <div className="word-break-all overflow-wrap-anywhere whitespace-pre-wrap">
+                                    {renderInputElements()}
+                                </div>
+                                <div
+                                    id={uniqueId ? `caret-${uniqueId}` : 'caret'}
+                                    className="terminal-caret"
+                                    style={{
+                                        left: `${caretPosition.left}px`,
+                                        top: `${caretPosition.top}px`,
+                                    }}
+                                />
+                            </>
+                        ) : (
+                            <>
+                            <div className="word-break-all overflow-wrap-anywhere whitespace-pre-wrap">
+                                &nbsp;
+                            </div>
+                            <div
+                                id={uniqueId ? `caret-${uniqueId}` : 'caret'}
+                                className="terminal-caret"
+                                style={{
+                                    left: `${caretPosition.left}px`,
+                                    top: `${caretPosition.top}px`,
+                                }}
+                            />
+                            </>
+                        )
+                    ) : ( 
                         <>
                             <span style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
                                 {userInput}

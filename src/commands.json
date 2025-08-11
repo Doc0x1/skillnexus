@@ -140,6 +140,163 @@
             }
         ]
     },
+    "PowerShell Commands - Beginner": {
+        "name": "Beginner PowerShell Commands",
+        "value": "powershell-terminal-beginner",
+        "type": "PowerShell-Commands",
+        "commands": [
+            {
+                "command": "Get-Help Get-ChildItem -Detailed",
+                "description": "Shows detailed help for a cmdlet (how to learn in-PS)."
+            },
+            {
+                "command": "Get-Command *service*",
+                "description": "Finds cmdlets/aliases/functions matching a pattern."
+            },
+            {
+                "command": "Get-ChildItem -Force",
+                "description": "Lists files (including hidden) in the current directory."
+            },
+            {
+                "command": "Set-Location C:\\Users\\Public",
+                "description": "Changes the working directory."
+            },
+            {
+                "command": "Get-Content .\\notes.txt",
+                "description": "Reads a file’s contents."
+            },
+            {
+                "command": "Set-Content .\\hello.txt 'Hello World'",
+                "description": "Creates/overwrites a file with text."
+            },
+            {
+                "command": "Add-Content .\\hello.txt 'Another line'",
+                "description": "Appends a line to a file."
+            },
+            {
+                "command": "New-Item -ItemType Directory .\\Logs",
+                "description": "Creates a new folder."
+            },
+            {
+                "command": "Copy-Item .\\file1.txt .\\file2.txt",
+                "description": "Copies a file."
+            },
+            {
+                "command": "Move-Item .\\oldname.txt .\\newname.txt",
+                "description": "Renames or moves a file."
+            },
+            {
+                "command": "Remove-Item .\\file2.txt",
+                "description": "Deletes a file."
+            },
+            {
+                "command": "Get-Process | Sort-Object CPU -Descending | Select-Object -First 5",
+                "description": "Shows top 5 CPU-consuming processes."
+            }
+        ]
+    },
+    "PowerShell Commands - Intermediate": {
+        "name": "Intermediate PowerShell Commands",
+        "value": "powershell-terminal-intermediate",
+        "type": "PowerShell-Commands",
+        "commands": [
+            {
+                "command": "Get-Service | Where-Object {$_.Status -eq 'Running'} | Sort-Object DisplayName",
+                "description": "Lists running services, sorted by name."
+            },
+            {
+                "command": "Restart-Service Spooler",
+                "description": "Restarts a specific service."
+            },
+            {
+                "command": "Get-EventLog -LogName System -Newest 20",
+                "description": "Reads the latest 20 System log entries."
+            },
+            {
+                "command": "Get-WinEvent -FilterHashtable @{LogName='Application'; Id=1000} -MaxEvents 10",
+                "description": "Filters events by log and ID."
+            },
+            {
+                "command": "Get-ChildItem C:\\ -Filter *.log -Recurse -ErrorAction SilentlyContinue",
+                "description": "Recursively finds .log files (suppressing errors)."
+            },
+            {
+                "command": "Select-String -Path .\\*.log -Pattern 'ERROR' -SimpleMatch",
+                "description": "Greps for 'ERROR' in local log files."
+            },
+            {
+                "command": "Invoke-WebRequest https://example.com -OutFile .\\page.html",
+                "description": "Downloads a web page to a file."
+            },
+            {
+                "command": "Invoke-RestMethod https://api.github.com/repos/PowerShell/PowerShell/releases/latest | Select-Object tag_name",
+                "description": "Calls a JSON API and selects a field."
+            },
+            {
+                "command": "Get-Process | Select-Object Name,Id,WS | Export-Csv .\\procs.csv -NoTypeInformation",
+                "description": "Exports selected process info to CSV."
+            },
+            {
+                "command": "Import-Csv .\\procs.csv | Where-Object {[int]$_.WS -gt 100000000}",
+                "description": "Reads CSV and filters by working set."
+            }
+        ]
+    },
+    "PowerShell Commands - Advanced": {
+        "name": "Advanced PowerShell Commands",
+        "value": "powershell-terminal-advanced",
+        "type": "PowerShell-Commands",
+        "commands": [
+            {
+                "command": "Enable-PSRemoting -Force",
+                "description": "Enables PowerShell remoting on the local machine."
+            },
+            {
+                "command": "Test-WSMan localhost",
+                "description": "Verifies WS-Management/Remoting is working."
+            },
+            {
+                "command": "Enter-PSSession -ComputerName SERVER01",
+                "description": "Starts an interactive remote session."
+            },
+            {
+                "command": "Invoke-Command -ComputerName SERVER01 -ScriptBlock { Get-Process | Select-Object -First 3 }",
+                "description": "Runs a script block on a remote host."
+            },
+            {
+                "command": "New-PSSession -ComputerName SERVER01 | Get-PSSession",
+                "description": "Creates and lists persistent remote sessions."
+            },
+            {
+                "command": "Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,OSArchitecture",
+                "description": "Queries system info via CIM (WMI)."
+            },
+            {
+                "command": "Start-Job -ScriptBlock { Get-Service; Start-Sleep 2 }",
+                "description": "Runs a background job."
+            },
+            {
+                "command": "Get-Job | Receive-Job -Wait -AutoRemoveJob",
+                "description": "Collects job output and cleans it up."
+            },
+            {
+                "command": "New-Item -Path HKCU:\\Software\\Demo -Force",
+                "description": "Creates a registry key (current user hive)."
+            },
+            {
+                "command": "Compress-Archive -Path .\\Logs -DestinationPath .\\Logs.zip -Force",
+                "description": "Zips a folder into a .zip file."
+            },
+            {
+                "command": "Start-Transcript -Path .\\session.log; Stop-Transcript",
+                "description": "Records the session to a log file."
+            },
+            {
+                "command": "$acl = Get-Acl .\\secret.txt; $rule = New-Object System.Security.AccessControl.FileSystemAccessRule('Users','Read','Allow'); $acl.AddAccessRule($rule); Set-Acl .\\secret.txt $acl",
+                "description": "Adds a read ACL rule to a file (ACL basics)."
+            }
+        ]
+    },
     "Pentesting Commands": {
         "name": "Pentesting Commands",
         "value": "linux-terminal-pentesting",
@@ -187,14 +344,14 @@
             }
         ]
     },
-    "Box 1 Walkthrough": {
-        "name": "Box 1 Walkthrough",
+    "Simulated CTF Walkthrough 1": {
+        "name": "Simulated CTF Walkthrough 1",
         "value": "linux-terminal-box1",
-        "type": "Box-Walkthroughs",
+        "type": "CTF-Walkthroughs",
         "commands": [
             {
                 "command": "nmap -sV -sC targetsite.com -p- --script=vuln",
-                "description": "Welcome to Box 1!\nFirst, we will begin with scanning it for open ports using Nmap.\nThis command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-).\nThe --script=vuln option will run vulnerability scripts to identify potential weaknesses."
+                "description": "Welcome to CTF Walkthrough 1!\nFirst, we will begin with scanning it for open ports using Nmap.\nThis command will run a service version detection (-sV), default scripts (-sC), and scan all ports (-p-).\nThe --script=vuln option will run vulnerability scripts to identify potential weaknesses."
             },
             {
                 "command": "whatweb http://targetsite.com:8080",

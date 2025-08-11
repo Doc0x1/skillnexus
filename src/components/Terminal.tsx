@@ -363,10 +363,12 @@ export default function Terminal({
                                     <TextInput
                                         ref={textInputRef}
                                         currentCommand=""
+                                        isTestTerminal={false}
                                         isTestRunning={false}
                                         userInput={input}
                                         onUserInputChange={handleUserInputChange}
                                         totalIncorrectChars={0}
+                                        uniqueId={instance.id}
                                     />
                                 </div>
                             </div>
